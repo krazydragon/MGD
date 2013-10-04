@@ -21,10 +21,11 @@ public class MyGdxGame implements ApplicationListener {
  
     // a libgdx helper class that logs the current FPS each second
     private SpriteBatch batch;
-    private FPSLogger fpsLogger;
     private Texture backgroundImage;
     private Texture shipImage;
     private Rectangle ship;
+    private Texture ship2Image;
+    private Rectangle ship2;
     private OrthographicCamera camera;
  
     @Override
@@ -32,6 +33,7 @@ public class MyGdxGame implements ApplicationListener {
     {
     	//load images
     	shipImage = new Texture(Gdx.files.internal("ship.png"));
+    	ship2Image = new Texture(Gdx.files.internal("motherShip.png"));
     	backgroundImage = new Texture(Gdx.files.internal("space.png"));
     	
     	
@@ -42,12 +44,19 @@ public class MyGdxGame implements ApplicationListener {
         Gdx.app.log( MyGdxGame.LOG, "Creating game" );
 
 
-        // create a Rectangle to logically represent the bucket
+        // create a Rectangle to logically represent the ships
         ship = new Rectangle();
-        ship.x = 800 / 2 - 64 / 2; // center the bucket horizontally
-        ship.y = 100; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
+        ship.x = 800 / 2 - 64 / 2; 
+        ship.y = 100; 
         ship.width = 64;
         ship.height = 64;
+        
+     
+        ship2 = new Rectangle();
+        ship2.x = 500 / 2 - 64 / 2; 
+        ship2.y = 1000; 
+        ship2.width = 128;
+        ship2.height = 128;
     }
     
     
@@ -78,6 +87,7 @@ public class MyGdxGame implements ApplicationListener {
         batch.begin();
         batch.draw(backgroundImage, 0, 0, Gdx.graphics.getHeight(),Gdx.graphics.getWidth());
         batch.draw(shipImage, ship.x, ship.y);
+        batch.draw(ship2Image, ship2.x, ship2.y);
         batch.end();
         
      // process user input
@@ -112,6 +122,7 @@ public class MyGdxGame implements ApplicationListener {
     {
     	backgroundImage.dispose();
     	shipImage.dispose();
+    	ship2Image.dispose();
         Gdx.app.log( MyGdxGame.LOG, "Disposing game" );
     }
 }
