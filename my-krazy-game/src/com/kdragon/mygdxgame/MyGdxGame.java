@@ -1,5 +1,7 @@
 package com.kdragon.mygdxgame;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -27,6 +29,9 @@ public class MyGdxGame implements ApplicationListener {
     private Texture ship2Image;
     private Rectangle ship2;
     private OrthographicCamera camera;
+    private Texture asteroidImage;
+    private Array<Rectangle> asteroids;
+    private long lastasteroidTime;
  
     @Override
     public void create()
@@ -35,7 +40,7 @@ public class MyGdxGame implements ApplicationListener {
     	shipImage = new Texture(Gdx.files.internal("ship.png"));
     	ship2Image = new Texture(Gdx.files.internal("motherShip.png"));
     	backgroundImage = new Texture(Gdx.files.internal("space.png"));
-    	
+    	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
     	
     	// create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -48,18 +53,29 @@ public class MyGdxGame implements ApplicationListener {
         ship = new Rectangle();
         ship.x = 800 / 2 - 64 / 2; 
         ship.y = 100; 
-        ship.width = 64;
-        ship.height = 64;
+        ship.width = 128;
+        ship.height = 128;
         
      
         ship2 = new Rectangle();
         ship2.x = 500 / 2 - 64 / 2; 
         ship2.y = 1000; 
-        ship2.width = 128;
-        ship2.height = 128;
+        ship2.width = 256;
+        ship2.height = 256;
+        
+        asteroids = new Array<Rectangle>();
+        spawnAsteroid();
     }
     
-    
+    private void spawnAsteroid() {
+        Rectangle asteroid = new Rectangle();
+        asteroid.x = MathUtils.random(0, 800-64);
+        asteroid.y = Gdx.graphics.getHeight();
+        asteroid.width = 64;
+        asteroid.height = 64;
+        asteroids.add(asteroid);
+        lastasteroidTime = TimeUtils.nanoTime();
+     }
      
  
     @Override
@@ -88,6 +104,9 @@ public class MyGdxGame implements ApplicationListener {
         batch.draw(backgroundImage, 0, 0, Gdx.graphics.getHeight(),Gdx.graphics.getWidth());
         batch.draw(shipImage, ship.x, ship.y);
         batch.draw(ship2Image, ship2.x, ship2.y);
+        for(Rectangle asteroid: asteroids) {
+            batch.draw(asteroidImage, asteroid.x, asteroid.y);
+         }
         batch.end();
         
      // process user input
@@ -101,6 +120,21 @@ public class MyGdxGame implements ApplicationListener {
         if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
       
  
+     
+        if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
+        
+        
+        Iterator<Rectangle> iter = asteroids.iterator();
+        while(iter.hasNext()) {
+           Rectangle asteroid = iter.next();
+           asteroid.y -= 200 * Gdx.graphics.getDeltaTime();
+           if(asteroid.y + 64 < 0) iter.remove();
+           if((asteroid.overlaps(ship))||(asteroid.overlaps(ship2))) {
+              
+              iter.remove();
+           }
+        }
+        
         // output the current FPS
         //fpsLogger.log();
     }
