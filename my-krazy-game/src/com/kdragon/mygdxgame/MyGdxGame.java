@@ -1,3 +1,12 @@
+/*
+ * project	my-krazy-game
+ * 
+ * package	com.kdragon.mygdxgame
+ * 
+ * @author	Ronaldo Barnes
+ * 
+ * date		Oct 1, 2013
+ */
 package com.kdragon.mygdxgame;
 
 import java.util.Iterator;
@@ -5,7 +14,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.FPSLogger;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,7 +22,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -32,7 +40,9 @@ public class MyGdxGame implements ApplicationListener {
     private Texture asteroidImage;
     private Array<Rectangle> asteroids;
     private long lastasteroidTime;
- 
+    private Sound shipSound;
+    private Sound asteroidSound;
+    
     @Override
     public void create()
     {
@@ -42,6 +52,10 @@ public class MyGdxGame implements ApplicationListener {
     	backgroundImage = new Texture(Gdx.files.internal("space.png"));
     	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
     	
+    	// load the drop sound effect and the rain background "music"
+        shipSound = Gdx.audio.newSound(Gdx.files.internal("ship.mp3"));
+        asteroidSound = Gdx.audio.newSound(Gdx.files.internal("asteroid.mp3"));
+        
     	// create the camera and the SpriteBatch
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getHeight(), Gdx.graphics.getWidth());
@@ -59,7 +73,7 @@ public class MyGdxGame implements ApplicationListener {
      
         ship2 = new Rectangle();
         ship2.x = 500 / 2 - 64 / 2; 
-        ship2.y = 1000; 
+        ship2.y = 1500; 
         ship2.width = 256;
         ship2.height = 256;
         
@@ -115,6 +129,7 @@ public class MyGdxGame implements ApplicationListener {
            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
            camera.unproject(touchPos);
            ship.x = touchPos.x - 64 / 2;
+           shipSound.play();
         }
         if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
@@ -130,7 +145,7 @@ public class MyGdxGame implements ApplicationListener {
            asteroid.y -= 200 * Gdx.graphics.getDeltaTime();
            if(asteroid.y + 64 < 0) iter.remove();
            if((asteroid.overlaps(ship))||(asteroid.overlaps(ship2))) {
-              
+              asteroidSound.play();
               iter.remove();
            }
         }
@@ -157,6 +172,9 @@ public class MyGdxGame implements ApplicationListener {
     	backgroundImage.dispose();
     	shipImage.dispose();
     	ship2Image.dispose();
+    	asteroidImage.dispose();
+    	asteroidSound.dispose();
+    	shipSound.dispose();
         Gdx.app.log( MyGdxGame.LOG, "Disposing game" );
     }
 }
