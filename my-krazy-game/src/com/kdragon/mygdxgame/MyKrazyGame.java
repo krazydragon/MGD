@@ -1,12 +1,3 @@
-/*
- * project	my-krazy-game
- * 
- * package	com.kdragon.mygdxgame
- * 
- * @author	Ronaldo Barnes
- * 
- * date		Oct 1, 2013
- */
 package com.kdragon.mygdxgame;
 
 import java.util.Iterator;
@@ -15,21 +6,25 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
-public class MyGdxGame implements ApplicationListener {
-    // constant useful for logging
-    public static final String LOG = MyGdxGame.class.getSimpleName();
- 
-    // a libgdx helper class that logs the current FPS each second
+public class MyKrazyGame implements ApplicationListener {
+	
+	// constant useful for logging
+    public static final String LOG = MyKrazyGame.class.getSimpleName();
+	// a libgdx helper class that logs the current FPS each second
     private SpriteBatch batch;
     private Texture backgroundImage;
     private Texture shipImage;
@@ -42,10 +37,14 @@ public class MyGdxGame implements ApplicationListener {
     private long lastasteroidTime;
     private Sound shipSound;
     private Sound asteroidSound;
-    
+    private int screenWidth;
+    private int screenHeight;
     @Override
     public void create()
     {
+    	
+    	screenHeight = Gdx.graphics.getHeight();
+    	screenWidth =Gdx.graphics.getWidth();
     	//load images
     	shipImage = new Texture(Gdx.files.internal("ship.png"));
     	ship2Image = new Texture(Gdx.files.internal("motherShip.png"));
@@ -60,7 +59,7 @@ public class MyGdxGame implements ApplicationListener {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Gdx.graphics.getHeight(), Gdx.graphics.getWidth());
     	batch = new SpriteBatch();
-        Gdx.app.log( MyGdxGame.LOG, "Creating game" );
+        Gdx.app.log( MyKrazyGame.LOG, "Creating game" );
 
 
         // create a Rectangle to logically represent the ships
@@ -83,10 +82,10 @@ public class MyGdxGame implements ApplicationListener {
     
     private void spawnAsteroid() {
         Rectangle asteroid = new Rectangle();
-        asteroid.x = MathUtils.random(0, 800-64);
-        asteroid.y = Gdx.graphics.getHeight();
-        asteroid.width = 64;
-        asteroid.height = 64;
+        asteroid.x = MathUtils.random(0, screenWidth-64);
+        asteroid.y = screenHeight*2;
+        asteroid.width = 16;
+        asteroid.height = 16;
         asteroids.add(asteroid);
         lastasteroidTime = TimeUtils.nanoTime();
      }
@@ -97,7 +96,7 @@ public class MyGdxGame implements ApplicationListener {
         int width,
         int height )
     {
-        Gdx.app.log( MyGdxGame.LOG, "Resizing game to: " + width + " x " + height );
+        Gdx.app.log( MyKrazyGame.LOG, "Resizing game to: " + width + " x " + height );
         
     }
  
@@ -157,13 +156,13 @@ public class MyGdxGame implements ApplicationListener {
     @Override
     public void pause()
     {
-        Gdx.app.log( MyGdxGame.LOG, "Pausing game" );
+        Gdx.app.log( MyKrazyGame.LOG, "Pausing game" );
     }
  
     @Override
     public void resume()
     {
-        Gdx.app.log( MyGdxGame.LOG, "Resuming game" );
+        Gdx.app.log( MyKrazyGame.LOG, "Resuming game" );
     }
  
     @Override
@@ -175,6 +174,6 @@ public class MyGdxGame implements ApplicationListener {
     	asteroidImage.dispose();
     	asteroidSound.dispose();
     	shipSound.dispose();
-        Gdx.app.log( MyGdxGame.LOG, "Disposing game" );
+        Gdx.app.log( MyKrazyGame.LOG, "Disposing game" );
     }
 }

@@ -1,12 +1,3 @@
-/*
- * project	my-krazy-game-desktop
- * 
- * package	com.kdragon.mygdxgame
- * 
- * @author	Ronaldo Barnes
- * 
- * date		Oct 1, 2013
- */
 package com.kdragon.mygdxgame;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
@@ -17,9 +8,9 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "my-krazy-game";
 		cfg.useGL20 = false;
-		cfg.width = 480;
-		cfg.height = 320;
+		cfg.width = 1920;
+		cfg.height = 1080;
 		
-		new LwjglApplication(new MyGdxGame(), cfg);
+		new LwjglApplication(new MyKrazyGame(), cfg);
 	}
 }
