@@ -29,16 +29,18 @@ public class MyKrazyGame implements ApplicationListener {
     private Texture backgroundImage;
     private Texture shipImage;
     private Rectangle ship;
-    private Texture ship2Image;
+    private Texture mothershipImage;
     private Rectangle ship2;
     private OrthographicCamera camera;
     private Texture asteroidImage;
     private Array<Rectangle> asteroids;
+    private Array<Rectangle> motherships;
     private long lastasteroidTime;
     private Sound shipSound;
     private Sound asteroidSound;
     private int screenWidth;
     private int screenHeight;
+    int tempNum;
     @Override
     public void create()
     {
@@ -47,7 +49,7 @@ public class MyKrazyGame implements ApplicationListener {
     	screenWidth =Gdx.graphics.getWidth();
     	//load images
     	shipImage = new Texture(Gdx.files.internal("ship.png"));
-    	ship2Image = new Texture(Gdx.files.internal("motherShip.png"));
+    	mothershipImage = new Texture(Gdx.files.internal("motherShip.png"));
     	backgroundImage = new Texture(Gdx.files.internal("space.png"));
     	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
     	
@@ -69,25 +71,30 @@ public class MyKrazyGame implements ApplicationListener {
         ship.width = 128;
         ship.height = 128;
         
-     
-        ship2 = new Rectangle();
-        ship2.x = 500 / 2 - 64 / 2; 
-        ship2.y = 1500; 
-        ship2.width = 256;
-        ship2.height = 256;
-        
         asteroids = new Array<Rectangle>();
+        motherships = new Array<Rectangle>();
         spawnAsteroid();
+        spawnMothership();
     }
     
     private void spawnAsteroid() {
         Rectangle asteroid = new Rectangle();
-        asteroid.x = MathUtils.random(0, screenWidth-64);
+        asteroid.x = MathUtils.random(0, screenWidth-64/2);
         asteroid.y = screenHeight*2;
         asteroid.width = 16;
         asteroid.height = 16;
         asteroids.add(asteroid);
         lastasteroidTime = TimeUtils.nanoTime();
+     }
+    
+    private void spawnMothership() {
+        Rectangle mothership = new Rectangle();
+        mothership.x = 500 / 2 - 64 / 2; 
+        mothership.y = 1500; 
+        mothership.width = 256;
+        mothership.height = 256;
+        motherships.add(mothership);
+        tempNum = 0;
      }
      
  
@@ -116,9 +123,11 @@ public class MyKrazyGame implements ApplicationListener {
         batch.begin();
         batch.draw(backgroundImage, 0, 0, Gdx.graphics.getHeight(),Gdx.graphics.getWidth());
         batch.draw(shipImage, ship.x, ship.y);
-        batch.draw(ship2Image, ship2.x, ship2.y);
         for(Rectangle asteroid: asteroids) {
             batch.draw(asteroidImage, asteroid.x, asteroid.y);
+         }
+        for(Rectangle mothership: motherships) {
+            batch.draw(mothershipImage, mothership.x, mothership.y);
          }
         batch.end();
         
@@ -127,8 +136,11 @@ public class MyKrazyGame implements ApplicationListener {
            Vector3 touchPos = new Vector3();
            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
            camera.unproject(touchPos);
+           
+        	// shipSound.play();  
+           
            ship.x = touchPos.x - 64 / 2;
-           shipSound.play();
+           
         }
         if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
@@ -139,14 +151,36 @@ public class MyKrazyGame implements ApplicationListener {
         
         
         Iterator<Rectangle> iter = asteroids.iterator();
+        Iterator<Rectangle> iter2 = motherships.iterator();
+        
         while(iter.hasNext()) {
            Rectangle asteroid = iter.next();
            asteroid.y -= 200 * Gdx.graphics.getDeltaTime();
            if(asteroid.y + 64 < 0) iter.remove();
-           if((asteroid.overlaps(ship))||(asteroid.overlaps(ship2))) {
+           if(asteroid.overlaps(ship)) {
               asteroidSound.play();
               iter.remove();
+              tempNum++;
+              if(tempNum == 1) {
+
+            	  Rectangle mothership = iter2.next();
+                  iter2.remove();
+                  
+               }
+              
+              if(tempNum == 2) {
+
+            	  spawnMothership();
+                  
+               }
            }
+           
+           
+               
+               
+               
+               
+           
         }
         
         // output the current FPS
@@ -170,7 +204,7 @@ public class MyKrazyGame implements ApplicationListener {
     {
     	backgroundImage.dispose();
     	shipImage.dispose();
-    	ship2Image.dispose();
+    	mothershipImage.dispose();
     	asteroidImage.dispose();
     	asteroidSound.dispose();
     	shipSound.dispose();
