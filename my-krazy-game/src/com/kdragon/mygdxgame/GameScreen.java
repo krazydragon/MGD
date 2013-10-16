@@ -2,8 +2,8 @@ package com.kdragon.mygdxgame;
 
 import java.util.Iterator;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -18,16 +18,13 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
-public class MyKrazyGame implements ApplicationListener {
-	
-	// constant useful for logging
+public class GameScreen implements Screen {
+    final KrazyGame game;
+
+ // constant useful for logging
     public static final String LOG = MyKrazyGame.class.getSimpleName();
 	// a libgdx helper class that logs the current FPS each second
     private SpriteBatch batch;
@@ -53,82 +50,79 @@ public class MyKrazyGame implements ApplicationListener {
     private Texture pauseImage;
     private Image pauseButton;
     private boolean isPlaying = true;
- 
-    
-    
-    
-    @Override
-    public void create()
-    {
-    	
-    	screenHeight = Gdx.graphics.getHeight();
-    	screenWidth =Gdx.graphics.getWidth();
-    	//load images
-    	Texture.setEnforcePotImages(false);
-    	shipImage = new Texture(Gdx.files.internal("ship.png"));
-    	mothershipImage = new Texture(Gdx.files.internal("motherShip.png"));
-    	backgroundImage = new Texture(Gdx.files.internal("space.jpg"));
-    	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
 
-    	tempNum = 0;
-    	
-    	
-    	
-    	pauseImage = new Texture(Gdx.files.internal("pause.png"));
-    	pauseButton= new Image(pauseImage);
-    	
-    	pauseButton.setBounds(1000, 1000, 64.0f, 64.0f);
-    	pauseButton.setTouchable(Touchable.enabled);
-    	pauseButton.addListener(new InputListener(){
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+    public GameScreen(final KrazyGame gam) {
+            this.game = gam;
+
+            screenHeight = Gdx.graphics.getHeight();
+        	screenWidth =Gdx.graphics.getWidth();
+        	//load images
+        	Texture.setEnforcePotImages(false);
+        	shipImage = new Texture(Gdx.files.internal("ship.png"));
+        	mothershipImage = new Texture(Gdx.files.internal("motherShip.png"));
+        	backgroundImage = new Texture(Gdx.files.internal("space.jpg"));
+        	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
+
+        	tempNum = 0;
+        	
+        	
+        	
+        	pauseImage = new Texture(Gdx.files.internal("pause.png"));
+        	pauseButton= new Image(pauseImage);
+        	
+        	pauseButton.setBounds(1000, 1000, 64.0f, 64.0f);
+        	pauseButton.setTouchable(Touchable.enabled);
+        	pauseButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                   
+                    pause();
+                    return true;
+                }
+        	});
+        	
+        	
+            Image backgound = new Image(backgroundImage);
+            stage = new Stage(screenWidth,screenHeight,true);
+            Gdx.input.setInputProcessor(stage);
+            
+
+            stage.addActor(backgound);
+            stage.addActor(pauseButton);
+                
+                
+                
+        	// load the drop sound effect and the rain background "music"
+            shipSound = Gdx.audio.newSound(Gdx.files.internal("ship.mp3"));
+            asteroidSound = Gdx.audio.newSound(Gdx.files.internal("asteroid.mp3"));
+            mothershipSound = Gdx.audio.newSound(Gdx.files.internal("mothership.mp3"));
+            
                
-                pause();
-                return true;
-            }
-    	});
-    	
-    	
-        Image backgound = new Image(backgroundImage);
-        stage = new Stage(screenWidth,screenHeight,true);
-        Gdx.input.setInputProcessor(stage);
-        
-
-        stage.addActor(backgound);
-        stage.addActor(pauseButton);
-            
-            
-            
-    	// load the drop sound effect and the rain background "music"
-        shipSound = Gdx.audio.newSound(Gdx.files.internal("ship.mp3"));
-        asteroidSound = Gdx.audio.newSound(Gdx.files.internal("asteroid.mp3"));
-        mothershipSound = Gdx.audio.newSound(Gdx.files.internal("mothership.mp3"));
-        
-           
-    	// create the camera and the SpriteBatch
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, screenHeight, screenWidth);
-    	batch = new SpriteBatch();
-        Gdx.app.log( MyKrazyGame.LOG, "Creating game" );
+        	// create the camera and the SpriteBatch
+            camera = new OrthographicCamera();
+            camera.setToOrtho(false, screenHeight, screenWidth);
+        	batch = new SpriteBatch();
+            Gdx.app.log( MyKrazyGame.LOG, "Creating game" );
 
 
-        // create a Rectangle to logically represent the ships
-        ship = new Rectangle();
-        ship.x = 800 / 2 - 64 / 2; 
-        ship.y = 100; 
-        ship.width = 100;
-        ship.height = 100;
-        
-        asteroids = new Array<Rectangle>();
-        motherships = new Array<Rectangle>();
-        mothershipIterator = motherships.iterator();
-    	
-        spawnAsteroid();
-        spawnMothership();
-        tempMothership = mothershipIterator.next();
-        
-        explosions = new Explosions();
+            // create a Rectangle to logically represent the ships
+            ship = new Rectangle();
+            ship.x = 800 / 2 - 64 / 2; 
+            ship.y = 100; 
+            ship.width = 100;
+            ship.height = 100;
+            
+            asteroids = new Array<Rectangle>();
+            motherships = new Array<Rectangle>();
+            mothershipIterator = motherships.iterator();
+        	
+            spawnAsteroid();
+            spawnMothership();
+            tempMothership = mothershipIterator.next();
+            
+            explosions = new Explosions();
+
     }
-    
+
     private void spawnAsteroid() {
         Rectangle asteroid = new Rectangle();
         asteroid.x = MathUtils.random(0, screenWidth-64/2);
@@ -148,24 +142,10 @@ public class MyKrazyGame implements ApplicationListener {
         motherships.add(mothership);
         
      }
-    
-     
- 
+
     @Override
-    public void resize(
-        int width,
-        int height )
-    {
-        Gdx.app.log( MyKrazyGame.LOG, "Resizing game to: " + width + " x " + height );
-        
-    }
- 
-    @Override
-    public void render()
-    {
-        // the following code clears the screen with the given RGB color (green)
-        //Gdx.gl.glClearColor( 0f, 1f, 0f, 1f );
-        Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
+    public void render(float delta) {
+Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
         
         // tell the camera to update its matrices.
         camera.update();
@@ -245,6 +225,9 @@ public class MyKrazyGame implements ApplicationListener {
         		spawnMothership();
             	tempMothership = mothershipIterator.next();
             	
+            	game.setScreen(new MainMenuScreen(game));
+                dispose();
+            	
         	}
 
         	
@@ -252,10 +235,22 @@ public class MyKrazyGame implements ApplicationListener {
         // output the current FPS
         //fpsLogger.log();
     }
- 
+
     @Override
-    public void pause()
-    {
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void show() {
+            
+    }
+
+    @Override
+    public void hide() {
+    }
+
+    @Override
+    public void pause() {
     	if( isPlaying )
         {
             isPlaying = false;
@@ -265,24 +260,20 @@ public class MyKrazyGame implements ApplicationListener {
             isPlaying = true;
         }
     }
- 
+
     @Override
-    public void resume()
-    {
-        Gdx.app.log( MyKrazyGame.LOG, "Resuming game" );
+    public void resume() {
     }
- 
+
     @Override
-    public void dispose()
-    {
+    public void dispose() {
     	backgroundImage.dispose();
     	shipImage.dispose();
     	mothershipImage.dispose();
     	asteroidImage.dispose();
     	asteroidSound.dispose();
     	shipSound.dispose();
-        Gdx.app.log( MyKrazyGame.LOG, "Disposing game" );
+        
     }
-    
-   
+
 }

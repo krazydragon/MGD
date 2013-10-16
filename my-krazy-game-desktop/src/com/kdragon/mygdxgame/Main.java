@@ -11,6 +11,6 @@ public class Main {
 		cfg.width = 1920;
 		cfg.height = 1080;
 		
-		new LwjglApplication(new MyKrazyGame(), cfg);
+		new LwjglApplication(new KrazyGame(), cfg);
 	}
 }
