@@ -13,6 +13,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -39,6 +44,12 @@ public class MyKrazyGame implements ApplicationListener {
     private int screenWidth;
     private int screenHeight;
     int tempNum;
+    private Explosions explosions;
+    private Stage stage;
+    private Texture pauseImage;
+    private Image pauseButton;
+    private boolean isPlaying = true;
+ 
     
     
     
@@ -55,11 +66,36 @@ public class MyKrazyGame implements ApplicationListener {
     	backgroundImage = new Texture(Gdx.files.internal("space.jpg"));
     	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
 
+    	tempNum = 0;
+    	pauseImage = new Texture(Gdx.files.internal("pause.png"));
+    	pauseButton= new Image(pauseImage);
+    	
+    	pauseButton.setBounds(500, 1000, 64.0f, 6.0f);
+    	pauseButton.setTouchable(Touchable.enabled);
+    	pauseButton.addListener(new InputListener(){
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+               
+                pause();
+                return true;
+            }
+     });
+    	
+    	
+        
+            stage = new Stage(screenWidth,screenHeight,true);
+            Gdx.input.setInputProcessor(stage);
+            
+  
+            stage.addActor(pauseButton);
+            
+            
+            
     	// load the drop sound effect and the rain background "music"
         shipSound = Gdx.audio.newSound(Gdx.files.internal("ship.mp3"));
         asteroidSound = Gdx.audio.newSound(Gdx.files.internal("asteroid.mp3"));
         mothershipSound = Gdx.audio.newSound(Gdx.files.internal("mothership.mp3"));
         
+           
     	// create the camera and the SpriteBatch
         camera = new OrthographicCamera();
         camera.setToOrtho(false, screenHeight, screenWidth);
@@ -81,6 +117,8 @@ public class MyKrazyGame implements ApplicationListener {
         spawnAsteroid();
         spawnMothership();
         tempMothership = mothershipIterator.next();
+        
+        explosions = new Explosions();
     }
     
     private void spawnAsteroid() {
@@ -100,8 +138,9 @@ public class MyKrazyGame implements ApplicationListener {
         mothership.width = 256;
         mothership.height = 256;
         motherships.add(mothership);
-        tempNum = 0;
+        
      }
+    
      
  
     @Override
@@ -128,17 +167,28 @@ public class MyKrazyGame implements ApplicationListener {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.draw(backgroundImage, 0, 0, screenHeight,screenWidth);
-        batch.draw(shipImage, ship.x, ship.y);
-        for(Rectangle asteroid: asteroids) {
-            batch.draw(asteroidImage, asteroid.x, asteroid.y);
-         }
-        for(Rectangle mothership: motherships) {
-            batch.draw(mothershipImage, mothership.x, mothership.y);
-            mothership.y -= 200 * Gdx.graphics.getDeltaTime();
+        if( isPlaying ){
+        	
+            batch.draw(shipImage, ship.x, ship.y);
+            for (int i = 0; i < explosions.getExplosionsHappening().size(); i++) 
+            {
+                Explosions getExp = explosions.getExplosionsHappening().get(i);
+                batch.draw(getExp.getCurrentFrame(),getExp.posx, getExp.posy);
+            }
+            for(Rectangle asteroid: asteroids) {
+                batch.draw(asteroidImage, asteroid.x, asteroid.y);
+             }
+            for(Rectangle mothership: motherships) {
+                batch.draw(mothershipImage, mothership.x, mothership.y);
+                mothership.y -= 200 * Gdx.graphics.getDeltaTime();
+                
+             }
             
-         }
-        batch.end();
+            
+        }
         
+        batch.end();
+        stage.draw();
      // process user input
         if(Gdx.input.isTouched()) {
            Vector3 touchPos = new Vector3();
@@ -167,7 +217,7 @@ public class MyKrazyGame implements ApplicationListener {
            if(asteroid.overlaps(ship)) {
         	   asteroidSound.play();
               asteroidIterator.remove();
-         
+              explosions.addExplosionsHappening(new Explosions(),asteroid.x,asteroid.y);
               
            }
            
@@ -183,11 +233,12 @@ public class MyKrazyGame implements ApplicationListener {
             	}else if(tempMothership.overlaps(ship)){
         		mothershipSound.play();
         		mothershipIterator.remove();
+        		explosions.addExplosionsHappening(new Explosions(),tempMothership.x,tempMothership.y);
         		spawnMothership();
             	tempMothership = mothershipIterator.next();
         	}
 
-        
+        	
         
         // output the current FPS
         //fpsLogger.log();
@@ -196,7 +247,14 @@ public class MyKrazyGame implements ApplicationListener {
     @Override
     public void pause()
     {
-        Gdx.app.log( MyKrazyGame.LOG, "Pausing game" );
+    	if( isPlaying )
+        {
+            isPlaying = false;
+        }
+        else
+        {
+            isPlaying = true;
+        }
     }
  
     @Override
@@ -216,4 +274,6 @@ public class MyKrazyGame implements ApplicationListener {
     	shipSound.dispose();
         Gdx.app.log( MyKrazyGame.LOG, "Disposing game" );
     }
+    
+   
 }
