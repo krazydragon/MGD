@@ -49,7 +49,6 @@ public class GameScreen implements Screen {
     private Sound mothershipSound;
     private int screenWidth;
     private int screenHeight;
-    private int tempNum;
     private AsteroidExplosions asteroidExplosions;
     private MothershipExplosions mothershipExplosions;
     private Stage stage;
@@ -78,10 +77,6 @@ public class GameScreen implements Screen {
         	backgroundImage = new Texture(Gdx.files.internal("space.jpg"));
         	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
 
-        	tempNum = 0;
-        	
-        	
-        	
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));
         	pauseButton= new Image(pauseImage);
         	
@@ -192,6 +187,9 @@ public class GameScreen implements Screen {
         	if(mothershipCount>0){
       		   mothershipCount --;
           	   mothershipLabel.setText("Motherships: "+mothershipCount); 
+          	 if((asteroidCount == 0)&&(mothershipCount == 0)){
+         		game.setScreen(new WinScreen(game));
+          	 }
       	   }
         	}else if(tempMothership.overlaps(ship)){
     		mothershipSound.play();
@@ -199,11 +197,14 @@ public class GameScreen implements Screen {
     		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),tempMothership.x,tempMothership.y);
     		spawnMothership();
         	tempMothership = mothershipIterator.next();
-        	if(hitCount<=5){
-        		hitCount ++;
-           	   hitLabel.setText("Hit: "+ hitCount); 
+        	if(hitCount < 10){
+        		hitCount = hitCount +3;
+           	   hitLabel.setText("Hit: "+ hitCount);
+           	if(hitCount >= 10){
+         		game.setScreen(new LoseScreen(game));
+         	   }
        	   }
-        	//game.setScreen(new MainMenuScreen(game));
+        	
             
         	
     	}
@@ -227,15 +228,21 @@ public class GameScreen implements Screen {
         	   if(asteroidCount>0){
         		   asteroidCount --;
             	   asteroidLabel.setText("Asteroids:"+asteroidCount); 
+            	   if((asteroidCount == 0)&&(mothershipCount == 0)){
+                		game.setScreen(new WinScreen(game));
+                	   }
         	   }
         	   
            }else if(asteroid.overlaps(ship)) {
         	   asteroidSound.play();
               asteroidIterator.remove();
               asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
-              if(hitCount<=5){
+              if(hitCount < 10){
           		hitCount ++;
-             	   hitLabel.setText("Hit: "+ hitCount); 
+             	hitLabel.setText("Hit: "+ hitCount); 
+             	if(hitCount >= 10){
+             		game.setScreen(new LoseScreen(game));
+             	   }
          	   }
            }
            
