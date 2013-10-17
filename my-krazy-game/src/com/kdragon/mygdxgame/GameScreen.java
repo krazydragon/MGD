@@ -6,9 +6,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -18,6 +20,9 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -25,7 +30,7 @@ public class GameScreen implements Screen {
     final KrazyGame game;
 
  // constant useful for logging
-    public static final String LOG = MyKrazyGame.class.getSimpleName();
+    public static final String LOG = KrazyGame.class.getSimpleName();
 	// a libgdx helper class that logs the current FPS each second
     private SpriteBatch batch;
     private Texture backgroundImage;
@@ -44,16 +49,26 @@ public class GameScreen implements Screen {
     private Sound mothershipSound;
     private int screenWidth;
     private int screenHeight;
-    int tempNum;
-    private Explosions explosions;
+    private int tempNum;
+    private AsteroidExplosions asteroidExplosions;
+    private MothershipExplosions mothershipExplosions;
     private Stage stage;
     private Texture pauseImage;
     private Image pauseButton;
     private boolean isPlaying = true;
+    private BitmapFont font;
+    private Label asteroidLabel;
+    private int asteroidCount;
+    private Label mothershipLabel;
+    private int mothershipCount;
+    private Label hitLabel;
+    private int hitCount;
+    
 
     public GameScreen(final KrazyGame gam) {
             this.game = gam;
 
+            font = new BitmapFont();
             screenHeight = Gdx.graphics.getHeight();
         	screenWidth =Gdx.graphics.getWidth();
         	//load images
@@ -70,7 +85,7 @@ public class GameScreen implements Screen {
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));
         	pauseButton= new Image(pauseImage);
         	
-        	pauseButton.setBounds(1000, 1000, 64.0f, 64.0f);
+        	pauseButton.setBounds(screenWidth/2, screenHeight-80, 64.0f, 64.0f);
         	pauseButton.setTouchable(Touchable.enabled);
         	pauseButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
@@ -86,8 +101,33 @@ public class GameScreen implements Screen {
             Gdx.input.setInputProcessor(stage);
             
 
+            asteroidLabel = new Label("Asteroids: 10", new Label.LabelStyle(font, Color.WHITE));
+            asteroidLabel.setPosition(screenWidth-200, screenHeight-80);
+            asteroidLabel.setFontScaleX(2); 
+            asteroidLabel.setFontScaleY(2);
+            asteroidLabel.setColor(0, 1, 0, 1);
+            asteroidCount = 10;
+            
+            mothershipLabel = new Label("Motherships: 3", new Label.LabelStyle(font, Color.WHITE));
+            mothershipLabel.setPosition(screenWidth-200, screenHeight-110);
+            mothershipLabel.setFontScaleX(2); 
+            mothershipLabel.setFontScaleY(2);
+            mothershipLabel.setColor(0, 1, 0, 1);
+            mothershipCount = 3;
+            
+            hitLabel = new Label("Hit: 0", new Label.LabelStyle(font, Color.WHITE));
+            hitLabel.setPosition(screenWidth-200, screenHeight-140);
+            hitLabel.setFontScaleX(2); 
+            hitLabel.setFontScaleY(2);
+            hitLabel.setColor(0, 1, 0, 1);
+            hitCount = 0;
+            
             stage.addActor(backgound);
             stage.addActor(pauseButton);
+            stage.addActor(asteroidLabel);
+            stage.addActor(mothershipLabel);
+            stage.addActor(hitLabel);
+            
                 
                 
                 
@@ -99,9 +139,9 @@ public class GameScreen implements Screen {
                
         	// create the camera and the SpriteBatch
             camera = new OrthographicCamera();
-            camera.setToOrtho(false, screenHeight, screenWidth);
+            camera.setToOrtho(false, screenWidth, screenHeight);
         	batch = new SpriteBatch();
-            Gdx.app.log( MyKrazyGame.LOG, "Creating game" );
+            
 
 
             // create a Rectangle to logically represent the ships
@@ -119,7 +159,8 @@ public class GameScreen implements Screen {
             spawnMothership();
             tempMothership = mothershipIterator.next();
             
-            explosions = new Explosions();
+            asteroidExplosions = new AsteroidExplosions();
+            mothershipExplosions = new MothershipExplosions();
 
     }
 
@@ -136,16 +177,75 @@ public class GameScreen implements Screen {
     private void spawnMothership() {
         Rectangle mothership = new Rectangle();
         mothership.x = 500 / 2 - 64 / 2; 
-        mothership.y = screenHeight*2; 
+        mothership.y = screenHeight; 
         mothership.width = 256;
         mothership.height = 256;
         motherships.add(mothership);
         
      }
+    
+    private void checkMothership(){
+    	if(tempMothership.y + 64 < 0){
+    		mothershipIterator.remove();
+    		spawnMothership();
+        	tempMothership = mothershipIterator.next();
+        	if(mothershipCount>0){
+      		   mothershipCount --;
+          	   mothershipLabel.setText("Motherships: "+mothershipCount); 
+      	   }
+        	}else if(tempMothership.overlaps(ship)){
+    		mothershipSound.play();
+    		mothershipIterator.remove();
+    		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),tempMothership.x,tempMothership.y);
+    		spawnMothership();
+        	tempMothership = mothershipIterator.next();
+        	if(hitCount<=5){
+        		hitCount ++;
+           	   hitLabel.setText("Hit: "+ hitCount); 
+       	   }
+        	//game.setScreen(new MainMenuScreen(game));
+            
+        	
+    	}
+    }
+    
+    private void checkAsteroid(){
+    	
+    	
+    	if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
+        
+        
+        Iterator<Rectangle> asteroidIterator = asteroids.iterator();
+        
+        while(asteroidIterator.hasNext()) {
+           Rectangle asteroid = asteroidIterator.next();
+           
+           asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
+           
+           if(asteroid.y + 64 < 0){
+        	   asteroidIterator.remove();
+        	   if(asteroidCount>0){
+        		   asteroidCount --;
+            	   asteroidLabel.setText("Asteroids:"+asteroidCount); 
+        	   }
+        	   
+           }else if(asteroid.overlaps(ship)) {
+        	   asteroidSound.play();
+              asteroidIterator.remove();
+              asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
+              if(hitCount<=5){
+          		hitCount ++;
+             	   hitLabel.setText("Hit: "+ hitCount); 
+         	   }
+           }
+           
+           
+        }
+    }
 
     @Override
     public void render(float delta) {
-Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
+    	Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
         
         // tell the camera to update its matrices.
         camera.update();
@@ -158,9 +258,14 @@ Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
         if( isPlaying ){
         	
             batch.draw(shipImage, ship.x, ship.y);
-            for (int i = 0; i < explosions.getExplosionsHappening().size(); i++) 
+            for (int i = 0; i < asteroidExplosions.getExplosionsHappening().size(); i++) 
             {
-                Explosions getExp = explosions.getExplosionsHappening().get(i);
+                AsteroidExplosions getExp = asteroidExplosions.getExplosionsHappening().get(i);
+                batch.draw(getExp.getCurrentFrame(),getExp.posx, getExp.posy);
+            }
+            for (int i = 0; i < mothershipExplosions.getExplosionsHappening().size(); i++) 
+            {
+                MothershipExplosions getExp = mothershipExplosions.getExplosionsHappening().get(i);
                 batch.draw(getExp.getCurrentFrame(),getExp.posx, getExp.posy);
             }
             for(Rectangle asteroid: asteroids) {
@@ -189,51 +294,8 @@ Gdx.gl.glClear( GL20.GL_COLOR_BUFFER_BIT );
         if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
       
- 
-     
-        if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
-        
-        
-        Iterator<Rectangle> asteroidIterator = asteroids.iterator();
-        
-        while(asteroidIterator.hasNext()) {
-           Rectangle asteroid = asteroidIterator.next();
-           
-           asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
-           
-           if(asteroid.y + 64 < 0) asteroidIterator.remove();
-           if(asteroid.overlaps(ship)) {
-        	   asteroidSound.play();
-              asteroidIterator.remove();
-              explosions.addExplosionsHappening(new Explosions(),asteroid.x,asteroid.y);
-              
-           }
-           
-           
-        }
-        
-        
-        
-        	if(tempMothership.y + 64 < 0){
-        		mothershipIterator.remove();
-        		spawnMothership();
-            	tempMothership = mothershipIterator.next();
-            	}else if(tempMothership.overlaps(ship)){
-        		mothershipSound.play();
-        		mothershipIterator.remove();
-        		explosions.addExplosionsHappening(new Explosions(),tempMothership.x,tempMothership.y);
-        		spawnMothership();
-            	tempMothership = mothershipIterator.next();
-            	
-            	game.setScreen(new MainMenuScreen(game));
-                dispose();
-            	
-        	}
-
-        	
-        
-        // output the current FPS
-        //fpsLogger.log();
+        checkMothership();
+        checkAsteroid();
     }
 
     @Override
