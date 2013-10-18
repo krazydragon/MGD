@@ -212,42 +212,43 @@ public class GameScreen implements Screen {
     
     private void checkAsteroid(){
     	
-    	
-    	if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
-        
-        
-        Iterator<Rectangle> asteroidIterator = asteroids.iterator();
-        
-        while(asteroidIterator.hasNext()) {
-           Rectangle asteroid = asteroidIterator.next();
-           
-           asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
-           
-           if(asteroid.y + 64 < 0){
-        	   asteroidIterator.remove();
-        	   if(asteroidCount>0){
-        		   asteroidCount --;
-            	   asteroidLabel.setText("Asteroids:"+asteroidCount); 
-            	   if((asteroidCount == 0)&&(mothershipCount == 0)){
-                		game.setScreen(new WinScreen(game));
-                	   }
-        	   }
-        	   
-           }else if(asteroid.overlaps(ship)) {
-        	   asteroidSound.play();
-              asteroidIterator.remove();
-              asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
-              if(hitCount < 10){
-          		hitCount ++;
-             	hitLabel.setText("Hit: "+ hitCount); 
-             	if(hitCount >= 10){
-             		game.setScreen(new LoseScreen(game));
+    	if( isPlaying ){
+    		if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
+            
+            
+            Iterator<Rectangle> asteroidIterator = asteroids.iterator();
+            
+            while(asteroidIterator.hasNext()) {
+               Rectangle asteroid = asteroidIterator.next();
+               
+               asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
+               
+               if(asteroid.y + 64 < 0){
+            	   asteroidIterator.remove();
+            	   if(asteroidCount>0){
+            		   asteroidCount --;
+                	   asteroidLabel.setText("Asteroids:"+asteroidCount); 
+                	   if((asteroidCount == 0)&&(mothershipCount == 0)){
+                    		game.setScreen(new WinScreen(game));
+                    	   }
+            	   }
+            	   
+               }else if(asteroid.overlaps(ship)) {
+            	   asteroidSound.play();
+                  asteroidIterator.remove();
+                  asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
+                  if(hitCount < 10){
+              		hitCount ++;
+                 	hitLabel.setText("Hit: "+ hitCount); 
+                 	if(hitCount >= 10){
+                 		game.setScreen(new LoseScreen(game));
+                 	   }
              	   }
-         	   }
-           }
-           
-           
-        }
+               }
+               
+               
+            }
+    	}
     }
 
     @Override
@@ -285,6 +286,8 @@ public class GameScreen implements Screen {
              }
             
             
+        }else if(!isPlaying){
+        	game.font.draw(batch, "Game Paused", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
         }
         
         batch.end();
