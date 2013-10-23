@@ -47,8 +47,8 @@ public class SplashScreen implements Screen {
             camera.update();
             stage.draw();
            
-            if (TimeUtils.millis()>(startTime+5000)){
-            	game.setScreen(new GameScreen(game));
+            if (TimeUtils.millis()>(startTime+1000)){
+            	game.setScreen(new MenuScreen(game));
             }
             
     
@@ -80,7 +80,7 @@ public class SplashScreen implements Screen {
 	}
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 }
