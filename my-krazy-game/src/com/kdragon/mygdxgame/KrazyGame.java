@@ -3,11 +3,12 @@ package com.kdragon.mygdxgame;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.kdragon.screens.SplashScreen;
 
 public class KrazyGame  extends Game {
     
-    SpriteBatch batch;
-    BitmapFont font;
+    public SpriteBatch batch;
+    public BitmapFont font;
 
     public void create() {
             batch = new SpriteBatch();

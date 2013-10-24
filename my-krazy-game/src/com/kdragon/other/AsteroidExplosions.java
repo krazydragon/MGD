@@ -1,4 +1,4 @@
-package com.kdragon.mygdxgame;
+package com.kdragon.other;
 
 
 

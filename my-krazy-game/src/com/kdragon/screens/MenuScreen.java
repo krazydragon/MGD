@@ -1,4 +1,4 @@
-package com.kdragon.mygdxgame;
+package com.kdragon.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,14 +8,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.kdragon.mygdxgame.KrazyGame;
 
 public class MenuScreen implements Screen {
 	
@@ -68,8 +67,37 @@ public class MenuScreen implements Screen {
                     return true;
                 }
         	});
+            
             gameButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 256.0f, 64.0f);
+            
+            
+            final TextButton insructionButton = new TextButton("HOW TO PLAY",textButtonStyle);
+            insructionButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                   
+                	game.setScreen(new HowToScreen(game));
+                	dispose();
+                    return true;
+                }
+        	});
+            
+            insructionButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 80, 256.0f, 64.0f);
+            
+            
+            final TextButton creditsButton = new TextButton("CREDITS",textButtonStyle);
+            creditsButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                   
+                	game.setScreen(new CreditScreen(game));
+                	dispose();
+                    return true;
+                }
+        	});
+            creditsButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 160, 256.0f, 64.0f);
+            
             stage.addActor(gameButton);
+            stage.addActor(insructionButton);
+            stage.addActor(creditsButton);
             
 
     }
@@ -110,7 +138,7 @@ public class MenuScreen implements Screen {
 	}
 	@Override
 	public void dispose() {
-		stage.dispose();
+
 		
 	}
 }

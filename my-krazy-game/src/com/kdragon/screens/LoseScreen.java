@@ -1,17 +1,18 @@
-package com.kdragon.mygdxgame;
+package com.kdragon.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.kdragon.mygdxgame.KrazyGame;
 
-public class WinScreen implements Screen {
+public class LoseScreen implements Screen {
 
 	final KrazyGame game;
 
     OrthographicCamera camera;
 
-    public WinScreen(final KrazyGame gam) {
+    public LoseScreen(final KrazyGame gam) {
             game = gam;
 
             camera = new OrthographicCamera();
@@ -27,12 +28,12 @@ public class WinScreen implements Screen {
             game.batch.setProjectionMatrix(camera.combined);
 
             game.batch.begin();
-            game.font.draw(game.batch, "You Win!!! ", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
+            game.font.draw(game.batch, "You Lose!!! ", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
             game.font.draw(game.batch, "Click anywhere to continue", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 30);
             game.batch.end();
 
             if (Gdx.input.isTouched()) {
-                    game.setScreen(new GameScreen(game));
+                    game.setScreen(new MenuScreen(game));
                     dispose();
             }
     }

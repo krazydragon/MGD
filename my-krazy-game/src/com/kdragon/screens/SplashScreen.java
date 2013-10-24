@@ -1,4 +1,4 @@
-package com.kdragon.mygdxgame;
+package com.kdragon.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.kdragon.mygdxgame.KrazyGame;
 
 
 
@@ -47,7 +48,7 @@ public class SplashScreen implements Screen {
             camera.update();
             stage.draw();
            
-            if (TimeUtils.millis()>(startTime+1000)){
+            if (TimeUtils.millis()>(startTime+500)){
             	game.setScreen(new MenuScreen(game));
             }
             

@@ -1,4 +1,4 @@
-package com.kdragon.mygdxgame;
+package com.kdragon.screens;
 
 import java.util.Iterator;
 
@@ -23,6 +23,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.kdragon.mygdxgame.KrazyGame;
+import com.kdragon.other.AsteroidExplosions;
+import com.kdragon.other.MothershipExplosions;
 
 public class GameScreen implements Screen {
     final KrazyGame game;
