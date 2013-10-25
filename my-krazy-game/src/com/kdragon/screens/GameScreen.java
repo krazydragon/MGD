@@ -75,7 +75,7 @@ public class GameScreen implements Screen {
         	Texture.setEnforcePotImages(false);
         	shipImage = new Texture(Gdx.files.internal("ship.png"));
         	mothershipImage = new Texture(Gdx.files.internal("motherShip.png"));
-        	backgroundImage = new Texture(Gdx.files.internal("space.jpg"));
+        	backgroundImage = new Texture(Gdx.files.internal("space.png"));
         	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
 
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));

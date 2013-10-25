@@ -30,10 +30,11 @@ public class CreditScreen implements Screen {
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Texture.setEnforcePotImages(false);
             stage = new Stage(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
-            CreditTexture = new Texture(Gdx.files.internal("space.jpg")); 
+            CreditTexture = new Texture(Gdx.files.internal("credits.png")); 
             CreditImage = new Image( CreditTexture);
             CreditImage.setFillParent( true );
 
+            
             
             stage.addActor( CreditImage );
 

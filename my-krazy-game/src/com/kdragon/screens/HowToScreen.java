@@ -32,7 +32,7 @@ public class HowToScreen implements Screen {
             
             Texture.setEnforcePotImages(false);
             stage = new Stage(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
-            howToTexture = new Texture(Gdx.files.internal("space.jpg")); 
+            howToTexture = new Texture(Gdx.files.internal("howto.png")); 
             howToImage = new Image( howToTexture);
             howToImage.setFillParent( true );
 

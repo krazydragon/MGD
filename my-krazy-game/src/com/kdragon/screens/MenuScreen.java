@@ -1,5 +1,7 @@
 package com.kdragon.screens;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -7,36 +9,59 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.kdragon.mygdxgame.KrazyGame;
 
 public class MenuScreen implements Screen {
 	
-	Skin skin;
-    Stage stage;
+	private SpriteBatch batch;
+	private Skin skin;
+	private Stage stage;
+    private static final float BUTTON_WIDTH = 300f;
+    private static final float BUTTON_HEIGHT = 60f;
+    private static final float BUTTON_SPACING = 10f;
+    private Texture asteroidImage;
+    private Array<Rectangle> asteroids;
+    private long lastasteroidTime;
+    private int screenWidth;
+    private int screenHeight;
     
-
 	final KrazyGame game;
 
     OrthographicCamera camera;
 
     public MenuScreen(final KrazyGame gam) {
+    	
+    		screenHeight = Gdx.graphics.getHeight();
+    		screenWidth =Gdx.graphics.getWidth();
+    		
+    		final float buttonX = ( screenWidth - BUTTON_WIDTH ) / 2;
+    		float currentY = screenHeight/2;
             game = gam;
-
+            batch = new SpriteBatch();
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            
             
             
             stage = new Stage();
             Gdx.input.setInputProcessor(stage);
      
-            
+            asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
+            Texture mainTexture = new Texture(Gdx.files.internal("menu.png"));
+            Image mainImage = new Image( mainTexture);
             skin = new Skin();
             // Generate a 1x1 green texture and store it in the skin named "green".
             Pixmap pixmap = new Pixmap(100, 100, Format.RGBA8888);
@@ -68,7 +93,7 @@ public class MenuScreen implements Screen {
                 }
         	});
             
-            gameButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 256.0f, 64.0f);
+            gameButton.setBounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             
             final TextButton insructionButton = new TextButton("HOW TO PLAY",textButtonStyle);
@@ -81,7 +106,7 @@ public class MenuScreen implements Screen {
                 }
         	});
             
-            insructionButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 80, 256.0f, 64.0f);
+            insructionButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             
             final TextButton creditsButton = new TextButton("CREDITS",textButtonStyle);
@@ -93,14 +118,19 @@ public class MenuScreen implements Screen {
                     return true;
                 }
         	});
-            creditsButton.setBounds(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 160, 256.0f, 64.0f);
+            creditsButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
+            stage.addActor(mainImage);
             stage.addActor(gameButton);
             stage.addActor(insructionButton);
             stage.addActor(creditsButton);
             
+            asteroids = new Array<Rectangle>();
+            spawnAsteroid();
 
     }
+    
+    
     @Override
     public void render(float delta) {
             Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -109,6 +139,14 @@ public class MenuScreen implements Screen {
             camera.update();
             stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
             stage.draw();
+            batch.setProjectionMatrix(camera.combined);
+            batch.begin();
+            for(Rectangle asteroid: asteroids) {
+                batch.draw(asteroidImage, asteroid.x, asteroid.y);
+             }
+            batch.end();
+            
+            checkAsteroid();
             
     }
 	@Override
@@ -141,4 +179,36 @@ public class MenuScreen implements Screen {
 
 		
 	}
+	
+	private void spawnAsteroid() {
+        Rectangle asteroid = new Rectangle();
+        asteroid.x = MathUtils.random(0, screenWidth-64/2);
+        asteroid.y = screenHeight*2;
+        asteroid.width = 100;
+        asteroid.height = 100;
+        asteroids.add(asteroid);
+        lastasteroidTime = TimeUtils.nanoTime();
+     }
+	
+private void checkAsteroid(){
+    	
+    	
+    		if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
+            
+            
+            Iterator<Rectangle> asteroidIterator = asteroids.iterator();
+            
+            while(asteroidIterator.hasNext()) {
+               Rectangle asteroid = asteroidIterator.next();
+               
+               asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
+               
+               if(asteroid.y + 64 < 0){
+            	   asteroidIterator.remove();
+            	   
+            	   }
+            	   
+               }
+    	
+    }
 }

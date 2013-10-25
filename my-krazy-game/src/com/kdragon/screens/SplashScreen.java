@@ -32,7 +32,7 @@ public class SplashScreen implements Screen {
             
             Texture.setEnforcePotImages(false);
             stage = new Stage(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(),true);
-            splashTexture = new Texture(Gdx.files.internal("space.jpg")); 
+            splashTexture = new Texture(Gdx.files.internal("splash.png")); 
             splashImage = new Image( splashTexture);
             splashImage.setFillParent( true );
 
@@ -48,7 +48,7 @@ public class SplashScreen implements Screen {
             camera.update();
             stage.draw();
            
-            if (TimeUtils.millis()>(startTime+500)){
+            if (TimeUtils.millis()>(startTime+5000)){
             	game.setScreen(new MenuScreen(game));
             }
             
