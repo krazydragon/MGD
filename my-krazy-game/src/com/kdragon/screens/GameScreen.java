@@ -36,11 +36,13 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture backgroundImage;
     private Texture shipImage;
+    private Texture gemImage;
     private Rectangle ship;
     private Texture mothershipImage;
     private OrthographicCamera camera;
     private Texture asteroidImage;
     private Array<Rectangle> asteroids;
+    private Array<Rectangle> gems;
     private Array<Rectangle> motherships;
     private Iterator<Rectangle> mothershipIterator;
 	private Rectangle tempMothership;
@@ -77,7 +79,8 @@ public class GameScreen implements Screen {
         	mothershipImage = new Texture(Gdx.files.internal("motherShip.png"));
         	backgroundImage = new Texture(Gdx.files.internal("space.png"));
         	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
-
+        	gemImage = new Texture(Gdx.files.internal("gem.png"));
+        	
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));
         	pauseButton= new Image(pauseImage);
         	
@@ -149,6 +152,7 @@ public class GameScreen implements Screen {
             
             asteroids = new Array<Rectangle>();
             motherships = new Array<Rectangle>();
+            gems = new Array<Rectangle>();
             mothershipIterator = motherships.iterator();
         	
             spawnAsteroid();
@@ -168,6 +172,16 @@ public class GameScreen implements Screen {
         asteroid.height = 100;
         asteroids.add(asteroid);
         lastasteroidTime = TimeUtils.nanoTime();
+     }
+    
+    private void spawnGem(float x, float y) {
+        Rectangle gem = new Rectangle();
+        gem.x = x;
+        gem.y = y;
+        gem.width = 100;
+        gem.height = 100;
+        gems.add(gem);
+        
      }
     
     private void spawnMothership() {
@@ -245,6 +259,7 @@ public class GameScreen implements Screen {
                  		game.setScreen(new LoseScreen(game));
                  	   }
              	   }
+                  spawnGem(asteroid.x, asteroid.y);
                }
                
                
@@ -266,7 +281,7 @@ public class GameScreen implements Screen {
         
         if( isPlaying ){
         	
-            batch.draw(shipImage, ship.x, ship.y);
+            
             for (int i = 0; i < asteroidExplosions.getExplosionsHappening().size(); i++) 
             {
                 AsteroidExplosions getExp = asteroidExplosions.getExplosionsHappening().get(i);
@@ -280,12 +295,15 @@ public class GameScreen implements Screen {
             for(Rectangle asteroid: asteroids) {
                 batch.draw(asteroidImage, asteroid.x, asteroid.y);
              }
+            for(Rectangle gem: gems) {
+                batch.draw(gemImage, gem.x, gem.y);
+             }
             for(Rectangle mothership: motherships) {
                 batch.draw(mothershipImage, mothership.x, mothership.y);
                 mothership.y -= 200 * Gdx.graphics.getDeltaTime();
                 
              }
-            
+            batch.draw(shipImage, ship.x, ship.y);
             
         }else if(!isPlaying){
         	game.font.draw(batch, "Game Paused", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
@@ -300,10 +318,14 @@ public class GameScreen implements Screen {
            camera.unproject(touchPos);
         	shipSound.play();  
            ship.x = touchPos.x - 64 / 2;
+           ship.y = touchPos.y - 64 / 2;
            
         }
         if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
         if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
+        
+        if(Gdx.input.isKeyPressed(Keys.DOWN)) ship.y -= 200 * Gdx.graphics.getDeltaTime();
+        if(Gdx.input.isKeyPressed(Keys.UP)) ship.y += 200 * Gdx.graphics.getDeltaTime();
       
         checkMothership();
         checkAsteroid();
