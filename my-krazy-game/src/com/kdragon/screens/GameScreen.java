@@ -36,6 +36,7 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture backgroundImage;
     private Texture shipImage;
+    private Texture smallLaserImage;
     private Texture gemImage;
     private Rectangle ship;
     private Texture mothershipImage;
@@ -43,9 +44,12 @@ public class GameScreen implements Screen {
     private Texture asteroidImage;
     private Array<Rectangle> asteroids;
     private Array<Rectangle> gems;
+    private Array<Rectangle> lasers;
+    private Iterator<Rectangle> laserIterator;
     private Array<Rectangle> motherships;
     private Iterator<Rectangle> mothershipIterator;
 	private Rectangle tempMothership;
+	private Rectangle tempLaser;
     private long lastasteroidTime;
     private Sound shipSound;
     private Sound asteroidSound;
@@ -80,6 +84,7 @@ public class GameScreen implements Screen {
         	backgroundImage = new Texture(Gdx.files.internal("space.png"));
         	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
         	gemImage = new Texture(Gdx.files.internal("gem.png"));
+        	smallLaserImage = new Texture(Gdx.files.internal("smallLaser.png"));
         	
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));
         	pauseButton= new Image(pauseImage);
@@ -151,8 +156,12 @@ public class GameScreen implements Screen {
             ship.height = 100;
             
             asteroids = new Array<Rectangle>();
-            motherships = new Array<Rectangle>();
+            
+            lasers = new Array<Rectangle>();
+            laserIterator = lasers.iterator();
             gems = new Array<Rectangle>();
+            
+            motherships = new Array<Rectangle>();
             mothershipIterator = motherships.iterator();
         	
             spawnAsteroid();
@@ -184,6 +193,16 @@ public class GameScreen implements Screen {
         
      }
     
+    private void spawnLaser(float x, float y) {
+        Rectangle laser = new Rectangle();
+        laser.x = x + 35;
+        laser.y = y + 75;
+        laser.width = 100;
+        laser.height = 100;
+        lasers.add(laser);
+        
+     }
+    
     private void spawnMothership() {
         Rectangle mothership = new Rectangle();
         mothership.x = 500 / 2 - 64 / 2; 
@@ -206,7 +225,7 @@ public class GameScreen implements Screen {
          		game.setScreen(new WinScreen(game));
           	 }
       	   }
-        	}else if(tempMothership.overlaps(ship)){
+        	}else if(tempMothership.overlaps(tempLaser)){
     		mothershipSound.play();
     		mothershipIterator.remove();
     		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),tempMothership.x,tempMothership.y);
@@ -248,7 +267,7 @@ public class GameScreen implements Screen {
                     	   }
             	   }
             	   
-               }else if(asteroid.overlaps(ship)) {
+               }else if(asteroid.overlaps(tempLaser)) {
             	   asteroidSound.play();
                   asteroidIterator.remove();
                   asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
@@ -292,6 +311,11 @@ public class GameScreen implements Screen {
                 MothershipExplosions getExp = mothershipExplosions.getExplosionsHappening().get(i);
                 batch.draw(getExp.getCurrentFrame(),getExp.posx, getExp.posy);
             }
+            for(Rectangle laser: lasers) {
+                batch.draw(smallLaserImage, laser.x, laser.y);
+                laser.y += 200 * Gdx.graphics.getDeltaTime();
+                
+             }
             for(Rectangle asteroid: asteroids) {
                 batch.draw(asteroidImage, asteroid.x, asteroid.y);
              }
@@ -319,13 +343,15 @@ public class GameScreen implements Screen {
         	shipSound.play();  
            ship.x = touchPos.x - 64 / 2;
            ship.y = touchPos.y - 64 / 2;
+           if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
+           if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
            
+           if(Gdx.input.isKeyPressed(Keys.DOWN)) ship.y -= 200 * Gdx.graphics.getDeltaTime();
+           if(Gdx.input.isKeyPressed(Keys.UP)) ship.y += 200 * Gdx.graphics.getDeltaTime();
+           spawnLaser(ship.x, ship.y);
+           tempLaser = laserIterator.next();
         }
-        if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
         
-        if(Gdx.input.isKeyPressed(Keys.DOWN)) ship.y -= 200 * Gdx.graphics.getDeltaTime();
-        if(Gdx.input.isKeyPressed(Keys.UP)) ship.y += 200 * Gdx.graphics.getDeltaTime();
       
         checkMothership();
         checkAsteroid();
