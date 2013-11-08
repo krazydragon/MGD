@@ -4,17 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.kdragon.mygdxgame.KrazyGame;
 
 public class LoseScreen implements Screen {
 
 	final KrazyGame game;
+	private Long startTime;
 
     OrthographicCamera camera;
 
     public LoseScreen(final KrazyGame gam) {
             game = gam;
-
+            startTime = TimeUtils.millis();
             camera = new OrthographicCamera();
             camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
@@ -32,9 +34,12 @@ public class LoseScreen implements Screen {
             game.font.draw(game.batch, "Click anywhere to continue", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2 - 30);
             game.batch.end();
 
-            if (Gdx.input.isTouched()) {
+            if (TimeUtils.millis()>(startTime + 1000)){
+            	if (Gdx.input.isTouched()) {
                     game.setScreen(new MenuScreen(game));
                     dispose();
+           
+                }
             }
     }
 	@Override

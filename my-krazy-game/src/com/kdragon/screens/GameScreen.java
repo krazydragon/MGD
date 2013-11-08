@@ -41,6 +41,7 @@ public class GameScreen implements Screen {
     private Texture bigLaserImage;
     private Texture enemyLaserImage;
     private Texture gemImage;
+    private Texture healthImage;
     private Texture laserUpgradeImage;
     private Rectangle ship;
     private Texture mothershipImage;
@@ -70,13 +71,13 @@ public class GameScreen implements Screen {
     private int asteroidCount;
     private Label mothershipLabel;
     private int mothershipCount;
-    private Label hitLabel;
     private int hitCount;
     private int laserDelay;
     private int enemyLaserDelay;
     private int bossLaserDelay;
     private int userLaser;
     private int score;
+    private int health;
     
    
 
@@ -97,6 +98,7 @@ public class GameScreen implements Screen {
         	backgroundImage = new Texture(Gdx.files.internal("space.png"));
         	asteroidImage = new Texture(Gdx.files.internal("asteroid.png"));
         	gemImage = new Texture(Gdx.files.internal("gem.png"));
+        	healthImage = new Texture(Gdx.files.internal("firstAid.png"));
         	laserUpgradeImage = new Texture(Gdx.files.internal("laserIcon.png"));
         	smallLaserImage = new Texture(Gdx.files.internal("smallLaser.png"));
         	tripleLaserImage = new Texture(Gdx.files.internal("tripleLaser.png"));
@@ -128,9 +130,10 @@ public class GameScreen implements Screen {
             asteroidLabel.setFontScaleY(2);
             asteroidLabel.setColor(0, 1, 0, 1);
             score = 0;
+            health = 100;
             asteroidCount = 7;
             
-            mothershipLabel = new Label("Motherships: 3", new Label.LabelStyle(game.font, Color.WHITE));
+            mothershipLabel = new Label("Health: 100", new Label.LabelStyle(game.font, Color.WHITE));
             mothershipLabel.setPosition(screenWidth-200, screenHeight-110);
             mothershipLabel.setFontScaleX(2); 
             mothershipLabel.setFontScaleY(2);
@@ -184,6 +187,7 @@ public class GameScreen implements Screen {
             laserDelay = 0;
             enemyLaserDelay = 0;
             bossLaserDelay = 0;
+            userLaser = 0;
 
     }
 
@@ -284,7 +288,8 @@ public class GameScreen implements Screen {
             	if(enemyLaser.overlaps(ship)){
             		
         			enemyLaserIterator.remove();
-        			
+        			health = health - 10;
+            		mothershipLabel.setText("Health:" + health );
                 	
         			
             	}
@@ -300,6 +305,8 @@ public class GameScreen implements Screen {
         		mothershipIterator.remove();
         		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),mothership.x,mothership.y);
         		spawnMothership();
+        		health = health - 25;
+        		mothershipLabel.setText("Health:" + health );
          	   
             }
         	
@@ -361,6 +368,7 @@ public class GameScreen implements Screen {
                   			z++;
                   			spawnAsteroid();
                   		} 
+                  		 mothershipCount++;
 					}
                 	
             	}
@@ -384,9 +392,9 @@ public class GameScreen implements Screen {
             	
             	Rectangle enemyLaser = enemyLaserIterator.next();
             	if(enemyLaser.overlaps(ship)){
-            		//game.setScreen(new LoseScreen(game));
         			enemyLaserIterator.remove();
-        			
+        			health = health - 15;
+            		mothershipLabel.setText("Health:" + health );
                 	
         			
             	}
@@ -401,7 +409,9 @@ public class GameScreen implements Screen {
             	mothershipSound.play();
         		bossIterator.remove();
         		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),bossShip.x,bossShip.y);
-        		//spawnMothership();
+        		spawnBossShip();
+        		health = health - 35;
+        		mothershipLabel.setText("Health:" + health );
          	   
             }
         	
@@ -436,7 +446,7 @@ public class GameScreen implements Screen {
                        		
                        		
                      	  }
-            			 if(hitCount == 29){
+            			 if(hitCount >= 29){
                      		game.setScreen(new WinScreen(game));
                      	  }
                	   }
@@ -451,8 +461,8 @@ public class GameScreen implements Screen {
         
         while(laserUpgradeIterator.hasNext()) {
         	
-        	Rectangle gem = laserUpgradeIterator.next();
-    		if(gem.overlaps(ship)) {
+        	Rectangle laserUpgrade = laserUpgradeIterator.next();
+    		if(laserUpgrade.overlaps(ship)) {
     			if(userLaser == 0){
     				asteroidSound.play();
     	         	  laserUpgradeIterator.remove();
@@ -494,6 +504,8 @@ public class GameScreen implements Screen {
             	   asteroidSound.play();
                    asteroidIterator.remove();
                    asteroidExplosions.addExplosionsHappening(new AsteroidExplosions(),asteroid.x,asteroid.y);
+                   health = health - 5;
+           		mothershipLabel.setText("Health:" + health );
                    break;
             	   
                }
@@ -521,7 +533,7 @@ public class GameScreen implements Screen {
                    if(x == 2){
                 	   spawnGem(asteroid.x, asteroid.y);
                    }
-                   break;
+                   
                	}  
                }
             }
@@ -531,11 +543,20 @@ public class GameScreen implements Screen {
         while(gemIterator.hasNext()) {
         	
         	Rectangle gem = gemIterator.next();
+    		
     		if(gem.overlaps(ship)) {
-         	   asteroidSound.play();
-               gemIterator.remove();
-               score += 1000;
-          		asteroidLabel.setText("Score:"+score);
+    			if(userLaser == 0){
+    				asteroidSound.play();
+    	               gemIterator.remove();
+    	               score += 1000;
+    	          		asteroidLabel.setText("Score:"+score);
+            	}else if((userLaser == 1)||(userLaser == 2)) {
+            		asteroidSound.play();
+                    gemIterator.remove();
+                    health = health + 20;
+               		mothershipLabel.setText("Health:" + health );
+            	}
+         	   
             }
     	}
     }
@@ -568,10 +589,10 @@ public class GameScreen implements Screen {
             for(Rectangle laser: lasers) {
             	if(userLaser == 0){
             		batch.draw(smallLaserImage, laser.x, laser.y);
-            		laser.y += 500 * Gdx.graphics.getDeltaTime();
+            		laser.y += 600 * Gdx.graphics.getDeltaTime();
             	}else if(userLaser == 1){
             		batch.draw(tripleLaserImage, laser.x, laser.y);
-            		laser.y += 700 * Gdx.graphics.getDeltaTime();
+            		laser.y += 750 * Gdx.graphics.getDeltaTime();
             	}else {
             		batch.draw(bigLaserImage, laser.x, laser.y);
             		laser.y += 900 * Gdx.graphics.getDeltaTime();
@@ -587,7 +608,12 @@ public class GameScreen implements Screen {
                 batch.draw(asteroidImage, asteroid.x, asteroid.y);
              }
             for(Rectangle gem: gems) {
-                batch.draw(gemImage, gem.x, gem.y);
+            	if(userLaser ==0){
+            		batch.draw(gemImage, gem.x, gem.y);
+            	}else {
+					batch.draw(healthImage, gem.x, gem.y);
+				}
+                
              }
             for(Rectangle laserUpgrade: laserUpgrades) {
                 batch.draw(laserUpgradeImage, laserUpgrade.x, laserUpgrade.y);
@@ -622,11 +648,11 @@ public class GameScreen implements Screen {
            laserDelay++;
            if(laserDelay == 50){
         	   if(userLaser <= 1){
-        		   spawnLaser(ship.x + 75, ship.y + 35);
+        		   spawnLaser(ship.x + 20, ship.y + 35);
            	}else if(userLaser >= 2){
-           		spawnLaser(ship.x, ship.y + 35);
-           		spawnLaser(ship.x + 75, ship.y + 35);
-           		spawnLaser(ship.x + 150, ship.y + 35);
+           		spawnLaser(ship.x - 25, ship.y + 35);
+           		spawnLaser(ship.x + 20, ship.y + 35);
+           		spawnLaser(ship.x + 60, ship.y + 35);
            	}
         	   
                laserDelay = 0;
@@ -641,7 +667,9 @@ public class GameScreen implements Screen {
             if(Gdx.input.isKeyPressed(Keys.DOWN)) ship.y -= 200 * Gdx.graphics.getDeltaTime();
             if(Gdx.input.isKeyPressed(Keys.UP)) ship.y += 200 * Gdx.graphics.getDeltaTime();
         }
-      
+      if(health <= 0){
+    	game.setScreen(new LoseScreen(game));
+      }
         
     }
 
