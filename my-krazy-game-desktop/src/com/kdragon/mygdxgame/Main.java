@@ -2,6 +2,7 @@ package com.kdragon.mygdxgame;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.kdragon.mygdxgame.KrazyGame;
 
 public class Main {
 	public static void main(String[] args) {
@@ -11,6 +12,6 @@ public class Main {
 		cfg.width = 1920;
 		cfg.height = 1080;
 		
-		new LwjglApplication(new KrazyGame(), cfg);
+		new LwjglApplication(new KrazyGame(new ActionResolverDesktop()), cfg);
 	}
 }

@@ -86,8 +86,8 @@ public class MenuScreen implements Screen {
             final TextButton gameButton=new TextButton("PLAY",textButtonStyle);
             gameButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
-                   
-                	game.setScreen(new GameScreen(game));
+                	if (!game.actionResolver.getSignedInGPGS()) game.actionResolver.loginGPGS();
+                	//game.setScreen(new GameScreen(game));
                 	dispose();
                     return true;
                 }
@@ -99,8 +99,9 @@ public class MenuScreen implements Screen {
             final TextButton insructionButton = new TextButton("HOW TO PLAY",textButtonStyle);
             insructionButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
-                   
-                	game.setScreen(new HowToScreen(game));
+                	if (game.actionResolver.getSignedInGPGS()) game.actionResolver.getLeaderboardGPGS();
+                    else game.actionResolver.loginGPGS();
+                	//game.setScreen(new HowToScreen(game));
                 	dispose();
                     return true;
                 }

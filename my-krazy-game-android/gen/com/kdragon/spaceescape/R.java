@@ -182,8 +182,8 @@ containing a value of this type.
         public static final int main=0x7f030000;
     }
     public static final class string {
-        public static final int app_id=0x7f060016;
-        public static final int app_name=0x7f060015;
+        public static final int app_id=0x7f06001a;
+        public static final int app_name=0x7f060019;
         /**   Title for notification shown when GooglePlayServices is unavailable [CHAR LIMIT=70] 
          */
         public static final int auth_client_availability_notification_title=0x7f06000f;
@@ -248,6 +248,10 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f06000e;
+        public static final int gamehelper_app_misconfigured=0x7f060016;
+        public static final int gamehelper_license_failed=0x7f060017;
+        public static final int gamehelper_sign_in_failed=0x7f060015;
+        public static final int gamehelper_unknown_error=0x7f060018;
         /**  Location client code resources (prefix with location_client) 
 
         Begin strings for location.reporting
