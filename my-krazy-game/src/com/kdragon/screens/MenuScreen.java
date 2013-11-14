@@ -114,7 +114,7 @@ public class MenuScreen implements Screen {
             creditsButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
                    
-                	game.setScreen(new CreditScreen(game));
+                	game.setScreen(new LeaderBoardScreen(game));
                 	dispose();
                     return true;
                 }

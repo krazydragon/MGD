@@ -31,5 +31,7 @@ public class KrazyGame  extends Game {
             batch.dispose();
             font.dispose();
     }
+    
+    
 
 }

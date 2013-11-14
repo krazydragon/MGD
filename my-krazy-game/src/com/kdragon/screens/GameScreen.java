@@ -87,7 +87,7 @@ public class GameScreen implements Screen {
             this.game = gam;
             
 
-            
+            //Get Screen Height and Width 
             screenHeight = Gdx.graphics.getHeight();
         	screenWidth =Gdx.graphics.getWidth();
         	//load images
@@ -105,6 +105,8 @@ public class GameScreen implements Screen {
         	bigLaserImage = new Texture(Gdx.files.internal("bigLaser.png"));
         	enemyLaserImage = new Texture(Gdx.files.internal("enemyLaser.png"));
         	
+        	
+        	//setup button
         	pauseImage = new Texture(Gdx.files.internal("pause.png"));
         	pauseButton= new Image(pauseImage);
         	
@@ -118,12 +120,13 @@ public class GameScreen implements Screen {
                 }
         	});
         	
-        	
+        	//add background image
             Image backgound = new Image(backgroundImage);
             stage = new Stage(screenWidth,screenHeight,true);
             Gdx.input.setInputProcessor(stage);
             
 
+            //create labels
             asteroidLabel = new Label("Score: 000000", new Label.LabelStyle(game.font, Color.WHITE));
             asteroidLabel.setPosition(screenWidth-200, screenHeight-80);
             asteroidLabel.setFontScaleX(2); 
@@ -143,6 +146,8 @@ public class GameScreen implements Screen {
             
             hitCount = 0;
             
+            
+            //add user interface
             stage.addActor(backgound);
             stage.addActor(pauseButton);
             stage.addActor(asteroidLabel);
@@ -172,6 +177,8 @@ public class GameScreen implements Screen {
             ship.width = 100;
             ship.height = 100;
             
+            
+            //setup asteroids weapons and rewards
             asteroids = new Array<Rectangle>();
             lasers = new Array<Rectangle>();
             enemyLasers = new Array<Rectangle>();
@@ -180,17 +187,21 @@ public class GameScreen implements Screen {
             motherships = new Array<Rectangle>();
             bossShips = new Array<Rectangle>();
             
-            
+            //add explosions
             asteroidExplosions = new AsteroidExplosions();
             mothershipExplosions = new MothershipExplosions();
             
+            //setup delays
             laserDelay = 0;
             enemyLaserDelay = 0;
             bossLaserDelay = 0;
+            
+            //setup player weapon
             userLaser = 0;
 
     }
 
+    //Generate Asteroid
     private void spawnAsteroid() {
         Rectangle asteroid = new Rectangle();
         asteroid.x = MathUtils.random(0, screenWidth-64/2);
@@ -201,6 +212,7 @@ public class GameScreen implements Screen {
         lastasteroidTime = TimeUtils.nanoTime();
      }
     
+  //Generate Rewards
     private void spawnGem(float x, float y) {
         Rectangle gem = new Rectangle();
         gem.x = x;
@@ -212,6 +224,7 @@ public class GameScreen implements Screen {
         
      }
     
+  //Generate weapon upgrades
     private void spawnLaserUpgrade(float x, float y) {
         Rectangle upgrade = new Rectangle();
         upgrade.x = x;
@@ -223,6 +236,7 @@ public class GameScreen implements Screen {
         
      }
     
+    ////Generate player and enemy laser
     private void spawnLaser(float x, float y) {
         Rectangle laser = new Rectangle();
         laser.x = x;
@@ -243,6 +257,8 @@ public class GameScreen implements Screen {
         
      }
     
+    
+    //create enemies
     private void spawnMothership() {
         Rectangle mothership = new Rectangle();
         Random rand = new Random();
@@ -268,18 +284,28 @@ public class GameScreen implements Screen {
         
      }
     
+    
+    //detect enemies interaction with user.
     private void checkMothership(){
+    	
+    	//setup enemy ship
     	Iterator<Rectangle> mothershipIterator = motherships.iterator();
         
         while(mothershipIterator.hasNext()) {
+        	
+        	//set ship speed
         	Rectangle mothership = mothershipIterator.next();
         	mothership.y -= 200 * Gdx.graphics.getDeltaTime();
+        	
+        	//fire laser
         	enemyLaserDelay++;
             if(enemyLaserDelay == 80){
          	   spawnEnemyLaser(mothership.x + 100, mothership.y);
          	  
                 enemyLaserDelay = 0;
             }
+            
+            //check and see if laser hit player
             Iterator<Rectangle> enemyLaserIterator = enemyLasers.iterator();
             
             while(enemyLaserIterator.hasNext()) {
@@ -294,11 +320,13 @@ public class GameScreen implements Screen {
         			
             	}
         	}
+            
+            //ship has reached bottom of screen create another
         	if(mothership.y + 64 < 0){
         		mothershipIterator.remove();
         		spawnMothership();
         		
-            	
+            //ship collides with player	
             }else if(mothership.overlaps(ship)){
          	   
             	mothershipSound.play();
@@ -310,6 +338,7 @@ public class GameScreen implements Screen {
          	   
             }
         	
+        	//check and see if user's laser has hit ship
         	Iterator<Rectangle> laserIterator = lasers.iterator();
             
             while(laserIterator.hasNext()) {
@@ -338,6 +367,8 @@ public class GameScreen implements Screen {
                		mothershipExplosions.addExplosionsHappening(new MothershipExplosions(),mothership.x,mothership.y);
                		
                	   }else{
+               		
+               		   //Player has multiple lasers detect which one hit ship
                		Iterator<Rectangle> tempIterator = motherships.iterator();
                     
                     while(tempIterator.hasNext()) {
@@ -350,6 +381,7 @@ public class GameScreen implements Screen {
                     }
                		
                	   }
+            		//upgrade player weapons and challenge player
                    	 if(mothershipCount == 3){
                    		spawnLaserUpgrade(mothership.x, mothership.y);
                    		hitCount = 4;
@@ -375,9 +407,12 @@ public class GameScreen implements Screen {
             }
         }
         
+        //Create boss ship
         Iterator<Rectangle> bossIterator = bossShips.iterator();
         while(bossIterator.hasNext()) {
         	Rectangle bossShip = bossIterator.next();
+        	
+        	//create lasers
         	bossLaserDelay++;
             if(bossLaserDelay == 90){
             	spawnEnemyLaser(bossShip.x, bossShip.y);
@@ -386,6 +421,8 @@ public class GameScreen implements Screen {
             	spawnEnemyLaser(bossShip.x + 300, bossShip.y);
                 bossLaserDelay = 0;
             }
+            
+            //detect if player gets hit by laser
             Iterator<Rectangle> enemyLaserIterator = enemyLasers.iterator();
             
             while(enemyLaserIterator.hasNext()) {
@@ -399,11 +436,13 @@ public class GameScreen implements Screen {
         			
             	}
         	}
+            //ship has reached bottom of screen create new one
         	if(bossShip.y + 64 < 0){
         		bossIterator.remove();
         		spawnBossShip();
         		
-            	
+            
+        		//detect boss ship collision with player ship
             }else if(bossShip.overlaps(ship)){
          	   
             	mothershipSound.play();
@@ -415,6 +454,7 @@ public class GameScreen implements Screen {
          	   
             }
         	
+        	//Detect if player has hit boss ship with laser
         	Iterator<Rectangle> laserIterator = lasers.iterator();
             
             while(laserIterator.hasNext()) {
@@ -435,6 +475,7 @@ public class GameScreen implements Screen {
                     		hitCount = hitCount + 5;
                     	}
             			
+            			//add multiple asteroids
             			Random rand = new Random();
             	        int x = rand.nextInt(3);
             			if((x == 1)){
@@ -446,6 +487,7 @@ public class GameScreen implements Screen {
                        		
                        		
                      	  }
+            			//player wins
             			 if(hitCount >= 29){
                      		game.setScreen(new WinScreen(game));
                      	  }
@@ -456,7 +498,7 @@ public class GameScreen implements Screen {
             }
         }
     	
-    	
+    	//upgrade player weapons 
         Iterator<Rectangle> laserUpgradeIterator = laserUpgrades.iterator();
         
         while(laserUpgradeIterator.hasNext()) {
@@ -473,7 +515,7 @@ public class GameScreen implements Screen {
                	  laserUpgradeIterator.remove();
                      userLaser ++;
                      spawnMothership();
-                	spawnMothership();
+                	
             	}
          	   
             }
@@ -481,10 +523,11 @@ public class GameScreen implements Screen {
     	
     }
     
-    
+    //detect asteroid interaction
     private void checkAsteroid(){
-    	
+    	//detect if game is paused
     	if( isPlaying ){
+    		//set delay between asteroids
     		if(TimeUtils.nanoTime() - lastasteroidTime > 1000000000) spawnAsteroid();
             
             
@@ -492,13 +535,14 @@ public class GameScreen implements Screen {
             
             while(asteroidIterator.hasNext()) {
                Rectangle asteroid = asteroidIterator.next();
-               
+               //set speed of asteroid
                asteroid.y -= 800 * Gdx.graphics.getDeltaTime();
                
+               //look to see if asteroid if off of screen
                if(asteroid.y + 64 < 0){
             	   asteroidIterator.remove();
             	   
-            	   
+            	//Detect asteroid collision with ship   
                }else if(asteroid.overlaps(ship)){
             	   
             	   asteroidSound.play();
@@ -510,6 +554,7 @@ public class GameScreen implements Screen {
             	   
                }
                
+               //Detect if user laser hits asteroid
                Iterator<Rectangle> laserIterator = lasers.iterator();
                
                while(laserIterator.hasNext()) {
@@ -538,6 +583,8 @@ public class GameScreen implements Screen {
                }
             }
     	}
+    	
+    	//give player rewards
     	Iterator<Rectangle> gemIterator = gems.iterator();
         
         while(gemIterator.hasNext()) {
@@ -572,10 +619,10 @@ public class GameScreen implements Screen {
         // coordinate system specified by the camera.
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        
+        //Check to see if game is paused
         if( isPlaying ){
         	
-        	
+        	//add animations and graphics to screen
             for (int i = 0; i < asteroidExplosions.getExplosionsHappening().size(); i++) 
             {
                 AsteroidExplosions getExp = asteroidExplosions.getExplosionsHappening().get(i);
@@ -586,6 +633,7 @@ public class GameScreen implements Screen {
                 MothershipExplosions getExp = mothershipExplosions.getExplosionsHappening().get(i);
                 batch.draw(getExp.getCurrentFrame(),getExp.posx, getExp.posy);
             }
+            //upgrade player weapons if player gets weapons upgrade
             for(Rectangle laser: lasers) {
             	if(userLaser == 0){
             		batch.draw(smallLaserImage, laser.x, laser.y);
@@ -607,6 +655,7 @@ public class GameScreen implements Screen {
             for(Rectangle asteroid: asteroids) {
                 batch.draw(asteroidImage, asteroid.x, asteroid.y);
              }
+            //detect which part of game user is on to determine which reward plyaer recieves
             for(Rectangle gem: gems) {
             	if(userLaser ==0){
             		batch.draw(gemImage, gem.x, gem.y);
@@ -628,11 +677,13 @@ public class GameScreen implements Screen {
             
             batch.draw(shipImage, ship.x, ship.y);
         }else if(!isPlaying){
+        	//inform player game is paused
         	game.font.draw(batch, "Game Paused", Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
         }
         
         batch.end();
         
+        //check for collisions
         checkMothership();
         checkAsteroid();
      // process user input
@@ -644,7 +695,7 @@ public class GameScreen implements Screen {
            ship.x = touchPos.x - 64 / 2;
            ship.y = touchPos.y - 64 / 2;
            
-           
+           //fire laser
            laserDelay++;
            if(laserDelay == 50){
         	   if(userLaser <= 1){
@@ -660,6 +711,7 @@ public class GameScreen implements Screen {
             
            
         }
+        //move player ship
         if(Gdx.input.isKeyPressed(Keys.ANY_KEY)){
         	if(Gdx.input.isKeyPressed(Keys.LEFT)) ship.x -= 200 * Gdx.graphics.getDeltaTime();
             if(Gdx.input.isKeyPressed(Keys.RIGHT)) ship.x += 200 * Gdx.graphics.getDeltaTime();
@@ -667,6 +719,8 @@ public class GameScreen implements Screen {
             if(Gdx.input.isKeyPressed(Keys.DOWN)) ship.y -= 200 * Gdx.graphics.getDeltaTime();
             if(Gdx.input.isKeyPressed(Keys.UP)) ship.y += 200 * Gdx.graphics.getDeltaTime();
         }
+        
+        //player dies no more health
       if(health <= 0){
     	game.setScreen(new LoseScreen(game));
       }
