@@ -44,6 +44,7 @@ public class MenuScreen implements Screen {
 
     public MenuScreen(final KrazyGame gam) {
     	
+    	
     		screenHeight = Gdx.graphics.getHeight();
     		screenWidth =Gdx.graphics.getWidth();
     		
@@ -87,7 +88,7 @@ public class MenuScreen implements Screen {
             gameButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
                 	if (!game.actionResolver.getSignedInGPGS()) game.actionResolver.loginGPGS();
-                	//game.setScreen(new GameScreen(game));
+                	game.setScreen(new GameScreen(game));
                 	dispose();
                     return true;
                 }
@@ -96,7 +97,7 @@ public class MenuScreen implements Screen {
             gameButton.setBounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             
-            final TextButton insructionButton = new TextButton("HOW TO PLAY",textButtonStyle);
+            final TextButton insructionButton = new TextButton("Global Leaderboard",textButtonStyle);
             insructionButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
                 	if (game.actionResolver.getSignedInGPGS()) game.actionResolver.getLeaderboardGPGS();
@@ -109,6 +110,16 @@ public class MenuScreen implements Screen {
             
             insructionButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
+            final TextButton localButton = new TextButton("Local LeaderBoard",textButtonStyle);
+            localButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                   
+                	game.setScreen(new LeaderBoardScreen(game));
+                	dispose();
+                    return true;
+                }
+        	});
+            localButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             final TextButton creditsButton = new TextButton("CREDITS",textButtonStyle);
             creditsButton.addListener(new InputListener(){
@@ -121,9 +132,12 @@ public class MenuScreen implements Screen {
         	});
             creditsButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
+            
+            
             stage.addActor(mainImage);
             stage.addActor(gameButton);
             stage.addActor(insructionButton);
+            stage.addActor(localButton);
             stage.addActor(creditsButton);
             
             asteroids = new Array<Rectangle>();

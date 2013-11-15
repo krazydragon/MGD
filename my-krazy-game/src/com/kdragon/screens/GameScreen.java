@@ -26,6 +26,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.kdragon.mygdxgame.KrazyGame;
 import com.kdragon.other.AsteroidExplosions;
 import com.kdragon.other.MothershipExplosions;
+import com.kdragon.other.ScoreData;
 
 public class GameScreen implements Screen {
     final KrazyGame game;
@@ -78,6 +79,7 @@ public class GameScreen implements Screen {
     private int userLaser;
     private int score;
     private int health;
+    private ScoreData scoreData;
     
    
 
@@ -85,7 +87,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(final KrazyGame gam) {
             this.game = gam;
-            
+            scoreData = new ScoreData();
 
             //Get Screen Height and Width 
             screenHeight = Gdx.graphics.getHeight();
@@ -490,6 +492,9 @@ public class GameScreen implements Screen {
             			//player wins
             			 if(hitCount >= 29){
                      		game.setScreen(new WinScreen(game));
+                     		//add scre to google and local leaderboad
+                     		game.actionResolver.submitScoreGPGS(score);
+                     		scoreData.addNewScore(score);
                      	  }
                	   }
             		
@@ -620,6 +625,7 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         //Check to see if game is paused
+        
         if( isPlaying ){
         	
         	//add animations and graphics to screen
@@ -691,7 +697,7 @@ public class GameScreen implements Screen {
            Vector3 touchPos = new Vector3();
            touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
            camera.unproject(touchPos);
-        	shipSound.play();  
+        	 
            ship.x = touchPos.x - 64 / 2;
            ship.y = touchPos.y - 64 / 2;
            
@@ -700,10 +706,12 @@ public class GameScreen implements Screen {
            if(laserDelay == 50){
         	   if(userLaser <= 1){
         		   spawnLaser(ship.x + 20, ship.y + 35);
+        		   shipSound.play(); 
            	}else if(userLaser >= 2){
            		spawnLaser(ship.x - 25, ship.y + 35);
            		spawnLaser(ship.x + 20, ship.y + 35);
            		spawnLaser(ship.x + 60, ship.y + 35);
+           		shipSound.play(); 
            	}
         	   
                laserDelay = 0;
@@ -723,6 +731,8 @@ public class GameScreen implements Screen {
         //player dies no more health
       if(health <= 0){
     	game.setScreen(new LoseScreen(game));
+    	game.actionResolver.submitScoreGPGS(score);
+    	scoreData.addNewScore(score);
       }
         
     }
