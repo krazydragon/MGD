@@ -27,6 +27,21 @@ public class ActionResolverDesktop implements ActionResolver{
             System.out.println("getLeaderboardGPGS");
     }
 
-    
+    @Override
+    public void unlockAchievementGPGS(String achievementId) {
+            System.out.println("unlockAchievement " + achievementId);
+    }
+
+	@Override
+	public void getAchievementsGPGS() {
+		System.out.println("getAchievementsGPGS");
+		
+	}
+
+	@Override
+	public void incrementAchievementGPGS(String achievementId, int increment) {
+		System.out.println("incrementAchievement " + achievementId);
+		
+	}
 
 }

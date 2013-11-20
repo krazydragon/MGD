@@ -32,14 +32,16 @@ public class ScoreData  {
 
 	 public ScoreData()
 	    {
-		 
+		 //setup arrays
 		 topScoreData = new int[10];
 	     todayData = new int[10];
+	     //go into preferences to see if infomation has benn created if not loat new.
 	     prefs = Gdx.app.getPreferences("My Preferences");
 	     fileSaved = prefs.getBoolean("fileSaved");
 	     String topScoreString = null;
 	     String todayString = null;
 	     dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+	     //load old files
 	     if(fileSaved){
 	    	 
 	    	 FileHandle file = Gdx.files.local("topScores.txt");
@@ -48,7 +50,7 @@ public class ScoreData  {
 	    	 String savedDay = prefs.getString("date");
 	    	 System.out.println(savedDay);
 	    	 
-	    	
+	    	//compare dates for filter
 	 		Date newDate = new Date();
 	 		String newStr = dateFormat.format(newDate.getTime());
 	 		System.out.println(newStr);
@@ -93,7 +95,7 @@ public class ScoreData  {
 	public void setScore(int _score){
 		score =_score;
 	}
-	
+	//add new player scores and save infomation
 	public void addNewScore(int tempScore){
 		
 		

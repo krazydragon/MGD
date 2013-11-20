@@ -88,4 +88,22 @@ public class MainActivity extends AndroidApplication implements GameHelper.GameH
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void unlockAchievementGPGS(String achievementId) {
+		gameHelper.getGamesClient().unlockAchievement(achievementId);
+		
+	}
+
+	@Override
+	public void getAchievementsGPGS() {
+		startActivityForResult(gameHelper.getGamesClient().getAchievementsIntent(), 1);
+		
+	}
+
+	@Override
+	public void incrementAchievementGPGS(String achievementId, int increment) {
+		gameHelper.getGamesClient().incrementAchievement(achievementId,increment);
+		
+	}
 }

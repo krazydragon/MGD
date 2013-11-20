@@ -15,5 +15,8 @@ public interface ActionResolver {
     public void loginGPGS();
     public void submitScoreGPGS(int score);
     public void getLeaderboardGPGS();
+    public void unlockAchievementGPGS(String achievementId);
+    public void getAchievementsGPGS();
+    public void incrementAchievementGPGS(String achievementId, int increment);
 }
 

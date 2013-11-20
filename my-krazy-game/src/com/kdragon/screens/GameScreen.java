@@ -88,7 +88,7 @@ public class GameScreen implements Screen {
     public GameScreen(final KrazyGame gam) {
             this.game = gam;
             scoreData = new ScoreData();
-
+            game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQBw");
             //Get Screen Height and Width 
             screenHeight = Gdx.graphics.getHeight();
         	screenWidth =Gdx.graphics.getWidth();
@@ -732,6 +732,7 @@ public class GameScreen implements Screen {
       if(health <= 0){
     	game.setScreen(new LoseScreen(game));
     	game.actionResolver.submitScoreGPGS(score);
+    	
     	scoreData.addNewScore(score);
       }
         
