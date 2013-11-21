@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
@@ -80,6 +81,7 @@ public class GameScreen implements Screen {
     private int score;
     private int health;
     private ScoreData scoreData;
+    private Preferences prefs;
     
    
 
@@ -88,7 +90,7 @@ public class GameScreen implements Screen {
     public GameScreen(final KrazyGame gam) {
             this.game = gam;
             scoreData = new ScoreData();
-            game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQBw");
+            
             //Get Screen Height and Width 
             screenHeight = Gdx.graphics.getHeight();
         	screenWidth =Gdx.graphics.getWidth();
@@ -495,6 +497,15 @@ public class GameScreen implements Screen {
                      		//add scre to google and local leaderboad
                      		game.actionResolver.submitScoreGPGS(score);
                      		scoreData.addNewScore(score);
+                     		//check to see if boss was killed for the first time.
+                        	boolean killedBossFirstTime = prefs.getBoolean("killedBossFirstTime", true);
+                        	
+                        	
+                        	if (killedBossFirstTime){
+                        		game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQCw");
+                        		prefs.putBoolean("killedBossFirstTime", false);
+                            	prefs.flush();
+                        	}
                      	  }
                	   }
             		
@@ -575,7 +586,9 @@ public class GameScreen implements Screen {
              		   asteroidCount --;
                  	    
                  	   if(asteroidCount == 0){
+                 		   
                  		   spawnMothership();
+                 		  game.actionResolver.incrementAchievementGPGS("CgkIxt2hl7YKEAIQCQ", 3);
                      	   }
              	   }
                    Random rand = new Random();
@@ -732,6 +745,14 @@ public class GameScreen implements Screen {
       if(health <= 0){
     	game.setScreen(new LoseScreen(game));
     	game.actionResolver.submitScoreGPGS(score);
+    	//check to see how many times user lost for negative achievement.
+    	int loseAllot = prefs.getInteger("loseAllot", 0);
+    	loseAllot++;
+    	prefs.putInteger("loseAllot", loseAllot);
+    	prefs.flush();
+    	if (loseAllot == 5){
+    		game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQCw");
+    	}
     	
     	scoreData.addNewScore(score);
       }

@@ -87,8 +87,8 @@ public class MenuScreen implements Screen {
             final TextButton gameButton=new TextButton("PLAY",textButtonStyle);
             gameButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
-                	if (!game.actionResolver.getSignedInGPGS()) game.actionResolver.loginGPGS();
-                	game.setScreen(new GameScreen(game));
+                	if (game.actionResolver.getSignedInGPGS()) game.setScreen(new GameScreen(game));
+                	else game.actionResolver.loginGPGS();
                 	dispose();
                     return true;
                 }
@@ -121,11 +121,24 @@ public class MenuScreen implements Screen {
         	});
             localButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
+            final TextButton achievementButton = new TextButton("Achievements",textButtonStyle);
+            achievementButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                   
+                	if (game.actionResolver.getSignedInGPGS()) game.actionResolver.getAchievementsGPGS();
+                    else game.actionResolver.loginGPGS();
+                	dispose();
+                    return true;
+                }
+        	});
+            
+            achievementButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
+            
             final TextButton creditsButton = new TextButton("CREDITS",textButtonStyle);
             creditsButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
                    
-                	game.setScreen(new LeaderBoardScreen(game));
+                	game.setScreen(new CreditScreen(game));
                 	dispose();
                     return true;
                 }
@@ -137,6 +150,7 @@ public class MenuScreen implements Screen {
             stage.addActor(mainImage);
             stage.addActor(gameButton);
             stage.addActor(insructionButton);
+            stage.addActor(achievementButton);
             stage.addActor(localButton);
             stage.addActor(creditsButton);
             
