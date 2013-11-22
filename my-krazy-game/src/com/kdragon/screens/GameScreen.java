@@ -672,13 +672,13 @@ public class GameScreen implements Screen {
             for(Rectangle laser: lasers) {
             	if(userLaser == 0){
             		batch.draw(smallLaserImage, laser.x, laser.y);
-            		laser.y += 600 * Gdx.graphics.getDeltaTime();
+            		laser.y += 800 * Gdx.graphics.getDeltaTime();
             	}else if(userLaser == 1){
             		batch.draw(tripleLaserImage, laser.x, laser.y);
-            		laser.y += 750 * Gdx.graphics.getDeltaTime();
+            		laser.y += 900 * Gdx.graphics.getDeltaTime();
             	}else {
             		batch.draw(bigLaserImage, laser.x, laser.y);
-            		laser.y += 900 * Gdx.graphics.getDeltaTime();
+            		laser.y += 1150 * Gdx.graphics.getDeltaTime();
             	}
                 
              }
@@ -732,7 +732,7 @@ public class GameScreen implements Screen {
            
            //fire laser
            laserDelay++;
-           if(laserDelay == 50){
+           if(laserDelay == 20){
         	   if(userLaser <= 1){
         		   spawnLaser(ship.x + 20, ship.y + 35);
         		   shipSound.play(); 

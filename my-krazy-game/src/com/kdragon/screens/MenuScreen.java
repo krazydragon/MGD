@@ -97,7 +97,7 @@ public class MenuScreen implements Screen {
             gameButton.setBounds(buttonX, currentY, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             
-            final TextButton insructionButton = new TextButton("Global Leaderboard",textButtonStyle);
+            final TextButton insructionButton = new TextButton("How to Play",textButtonStyle);
             insructionButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
                 	game.setScreen(new HowToScreen(game));
