@@ -71,6 +71,7 @@ public class GameScreen implements Screen {
     private boolean isPlaying = true;
     private Label asteroidLabel;
     private int asteroidCount;
+    private int asteroidCountdown;
     private Label mothershipLabel;
     private int mothershipCount;
     private int hitCount;
@@ -88,8 +89,11 @@ public class GameScreen implements Screen {
     
 
     public GameScreen(final KrazyGame gam) {
-            this.game = gam;
-            scoreData = new ScoreData();
+            
+    		this.game = gam;
+    		prefs = Gdx.app.getPreferences("My Preferences");
+    		scoreData = new ScoreData();
+            
             
             //Get Screen Height and Width 
             screenHeight = Gdx.graphics.getHeight();
@@ -138,7 +142,9 @@ public class GameScreen implements Screen {
             asteroidLabel.setColor(0, 1, 0, 1);
             score = 0;
             health = 100;
-            asteroidCount = 7;
+            asteroidCount = prefs.getInteger("asteroidCount", 0);;
+            asteroidCountdown = 7;
+            
             
             mothershipLabel = new Label("Health: 100", new Label.LabelStyle(game.font, Color.WHITE));
             mothershipLabel.setPosition(screenWidth-200, screenHeight-110);
@@ -202,6 +208,16 @@ public class GameScreen implements Screen {
             
             //setup player weapon
             userLaser = 0;
+            
+            //set play count achievement
+            int playCount = prefs.getInteger("playCount", 0);
+            
+        	if (playCount <= 5){
+        		playCount++;
+            	prefs.putInteger("playCount", playCount);
+            	prefs.flush();
+        		game.actionResolver.incrementAchievementGPGS("CgkIxt2hl7YKEAIQDA", playCount);
+        	}
 
     }
 
@@ -502,7 +518,7 @@ public class GameScreen implements Screen {
                         	
                         	
                         	if (killedBossFirstTime){
-                        		game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQCw");
+                        		game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQCg");
                         		prefs.putBoolean("killedBossFirstTime", false);
                             	prefs.flush();
                         	}
@@ -582,21 +598,21 @@ public class GameScreen implements Screen {
                		laserIterator.remove();
                		score += 100;
                		asteroidLabel.setText("Score:"+score);
-               		if(asteroidCount>0){
-             		   asteroidCount --;
-                 	    
-                 	   if(asteroidCount == 0){
-                 		   
+               		if(asteroidCountdown>0){
+               			asteroidCountdown --; 
+                 	   if(asteroidCountdown == 0){
                  		   spawnMothership();
-                 		  game.actionResolver.incrementAchievementGPGS("CgkIxt2hl7YKEAIQCQ", 3);
-                     	   }
+                 	   }
              	   }
                    Random rand = new Random();
                    int x = rand.nextInt(3);
                    if(x == 2){
                 	   spawnGem(asteroid.x, asteroid.y);
                    }
-                   
+                   asteroidCount ++;
+                   if(asteroidCount == 20){
+                	   game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQDQ");
+                   }
                	}  
                }
             }
@@ -750,7 +766,7 @@ public class GameScreen implements Screen {
     	loseAllot++;
     	prefs.putInteger("loseAllot", loseAllot);
     	prefs.flush();
-    	if (loseAllot == 5){
+    	if (loseAllot == 3){
     		game.actionResolver.unlockAchievementGPGS("CgkIxt2hl7YKEAIQCw");
     	}
     	

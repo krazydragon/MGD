@@ -100,15 +100,25 @@ public class MenuScreen implements Screen {
             final TextButton insructionButton = new TextButton("Global Leaderboard",textButtonStyle);
             insructionButton.addListener(new InputListener(){
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
-                	if (game.actionResolver.getSignedInGPGS()) game.actionResolver.getLeaderboardGPGS();
-                    else game.actionResolver.loginGPGS();
-                	//game.setScreen(new HowToScreen(game));
+                	game.setScreen(new HowToScreen(game));
                 	dispose();
                     return true;
                 }
         	});
             
             insructionButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
+            
+            final TextButton globalButton = new TextButton("Global Leaderboard",textButtonStyle);
+            globalButton.addListener(new InputListener(){
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int    button){
+                	if (game.actionResolver.getSignedInGPGS()) game.actionResolver.getLeaderboardGPGS();
+                    else game.actionResolver.loginGPGS();
+                	dispose();
+                    return true;
+                }
+        	});
+            
+            globalButton.setBounds(buttonX, currentY -= BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT);
             
             final TextButton localButton = new TextButton("Local LeaderBoard",textButtonStyle);
             localButton.addListener(new InputListener(){
@@ -151,6 +161,7 @@ public class MenuScreen implements Screen {
             stage.addActor(gameButton);
             stage.addActor(insructionButton);
             stage.addActor(achievementButton);
+            stage.addActor(globalButton);
             stage.addActor(localButton);
             stage.addActor(creditsButton);
             
